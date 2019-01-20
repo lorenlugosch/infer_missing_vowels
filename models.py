@@ -2,7 +2,7 @@ import torch
 from helper_functions import one_hot
 
 class EncoderDecoder(torch.nn.Module):
-	def __init__(self, Sx_size, Sy_size, y_eos):
+	def __init__(self, num_encoder_layers, num_encoder_hidden, num_decoder_layers, num_decoder_hidden, Sx_size, Sy_size, y_eos):
 		super(EncoderDecoder, self).__init__()
 		self.encoder_rnn = 1
 		self.encoder_linear = 1
