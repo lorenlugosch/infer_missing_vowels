@@ -11,7 +11,7 @@ class EncoderDecoder(torch.nn.Module):
 		self.decoder_log_softmax = torch.nn.LogSoftmax(dim=1)
 		self.y_eos = y_eos # index of the end-of-sequence token
 
-	def forward(x, y):
+	def forward(self, x, y):
 		"""
 		x : Tensor of shape (batch size, |Sx|, T)
 		y : Tensor of shape (batch size, |Sy|, U) - padded with end-of-sequence tokens
