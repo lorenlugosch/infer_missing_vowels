@@ -23,12 +23,10 @@ def get_batch(dataset, indices, Sx, Sy, x_eos, y_eos):
 	# pad all sequences with EOS to have same length
 	for index in range(len(x)):
 		x[index] += [x_eos] * (T - len(x[index]))
-		x[index] = one_hot(x[index], len(Sx))
 		y[index] += [y_eos] * (U - len(y[index]))
-		y[index] = one_hot(y[index], len(Sy))
 
-	x = torch.stack(x)
-	y = torch.stack(y)
+	x = one_hot(torch.stack(x))
+	y = one_hot(torch.stack(y))
 
 	return (x,y)
 
