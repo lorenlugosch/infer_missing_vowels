@@ -9,6 +9,11 @@ def train(model, dataset):
 def test(model, dataset):
 	return 1
 
+def get_batch(dataset, indices):
+	x = dataset[0][indices]
+	y = dataset[1][indices]
+	return (x,y)
+
 # To use a different training text file, just change this path.
 # Each line separated by '\n' will be used as one training example.
 with open("war_and_peace.txt", "r") as f:
@@ -49,6 +54,10 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						Sy_size=Sy_size,
 						y_eos=y_eos,
 						dropout=True)
+
+x,y = get_batch(train_dataset, [0,1])
+model()
+sys.exit()
 
 num_epochs = 10
 for epoch in range(num_epochs):

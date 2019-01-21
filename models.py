@@ -14,7 +14,7 @@ class EncoderDecoder(torch.nn.Module):
 	def forward(x, y):
 		"""
 		x : Tensor of shape (batch size, |Sx|, T)
-		y : Tensor of shape (batch size, |Sy|, U) - padded with self.y_eos
+		y : Tensor of shape (batch size, |Sy|, U) - padded with end-of-sequence tokens
 
 		Compute log p(y|x) for each (x,y) in the batch.
 		"""
