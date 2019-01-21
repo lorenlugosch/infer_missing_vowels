@@ -75,7 +75,7 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						dropout=0.5)
 
 x,y = get_batch(train_dataset, [0,1], Sx, Sy, x_eos, y_eos)
-model()
+model(x,y)
 sys.exit()
 
 num_epochs = 10
