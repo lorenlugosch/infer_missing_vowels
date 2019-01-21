@@ -9,11 +9,11 @@ def train(model, dataset):
 def test(model, dataset):
 	return 1
 
-def get_batch(dataset, indices):
+def get_batch(dataset, indices, Sx, Sy):
 	x = []; y = []
 	for index in indices:
-		x.append(dataset[0][index])
-		y.append(dataset[1][index])
+		x.append([Sx.index(c) for c in dataset[0][index]])
+		y.append([Sy.index(c) for c in dataset[1][index]])
 	return (x,y)
 
 # To use a different training text file, just change this path.
@@ -57,7 +57,7 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						y_eos=y_eos,
 						dropout=0.5)
 
-x,y = get_batch(train_dataset, [0,1])
+x,y = get_batch(train_dataset, [0,1], Sx, Sy)
 model()
 sys.exit()
 
