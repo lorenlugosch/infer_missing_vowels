@@ -79,7 +79,7 @@ test_dataset = (test_input, test_labels)
 # initialize model
 model = EncoderDecoder(	num_encoder_layers=2,
 						num_encoder_hidden=128, 
-						num_decoder_layers=2, 
+						num_decoder_layers=1, 
 						num_decoder_hidden=128, 
 						Sx_size=Sx_size, 
 						Sy_size=Sy_size,
