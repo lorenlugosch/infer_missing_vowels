@@ -59,12 +59,12 @@ class EncoderDecoder(torch.nn.Module):
 		"""
 		y_hat = [] # List of guessed outputs for each input in the batch.
 
+		U_max = 100 # maximum length
 		for x_ in x:
 			done = False
 			beam = []
-			while not done:
-				for b in range(B):
-					1
+			while u < U_max:
+				1
 
 			y_hat.append(beam[0])
 

@@ -12,4 +12,4 @@ def one_hot(letters, S):
 		for t in range(0, letters.shape[1]):
 			out[i,letters[i,t], t] = 1
 	return out
-	
+
