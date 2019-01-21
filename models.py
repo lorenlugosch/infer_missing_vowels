@@ -25,9 +25,7 @@ class EncoderDecoder(torch.nn.Module):
 
 		# Encode the input sequence into a single fixed-length vector
 		_, encoder_state = self.encoder_rnn(x)
-		print(encoder_state.shape)
 		encoder_state = torch.cat([encoder_state[-1], encoder_state[-2]], dim=1)
-		print(encoder_state.shape)
 
 		# Initialize the decoder state using the encoder state
 		decoder_state = self.encoder_linear(encoder_state)
@@ -40,12 +38,12 @@ class EncoderDecoder(torch.nn.Module):
 				decoder_state = self.decoder_rnn(torch.zeros(batch_size, Sy_size), decoder_state)
 			else:
 				# Feed in the previous element of y; update the decoder state
-				decoder_state = self.decoder_rnn(y[:,:,u-1], decoder_state)
+				decoder_state = self.decoder_rnn(y[:,u-1,:], decoder_state)
 
 			# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
 			out = self.decoder_linear(decoder_state)
 			out = self.decoder_log_softmax(out)
-			log_p_yu = (out * y[:,:,u]).sum() # y_u is one-hot; use dot-product to select the y_u'th output probability
+			log_p_yu = (out * y[:,u,:]).sum() # y_u is one-hot; use dot-product to select the y_u'th output probability
 
 			# Add log p(y_u|...) to log p(y|x)
 			log_p_y_x += log_p_yu
