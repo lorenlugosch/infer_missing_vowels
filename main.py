@@ -27,8 +27,8 @@ def get_batch(dataset, indices, Sx, Sy, x_eos, y_eos):
 		y[index] += [y_eos] * (U - len(y[index]))
 		y[index] = torch.tensor(y[index])
 
-	x = one_hot(torch.stack(x))
-	y = one_hot(torch.stack(y))
+	x = one_hot(torch.stack(x), len(Sx))
+	y = one_hot(torch.stack(y), len(Sy))
 
 	return (x,y)
 
