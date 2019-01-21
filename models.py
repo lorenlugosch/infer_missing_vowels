@@ -25,8 +25,8 @@ class EncoderDecoder(torch.nn.Module):
 
 		# Encode the input sequence into a single fixed-length vector
 		_, encoder_state = self.encoder_rnn(x)
-		encoder_state = torch.cat([encoder_state[-1], encoder_state[-2]])
-		print(x.shape)
+		print(encoder_state.shape)
+		encoder_state = torch.cat([encoder_state[-1], encoder_state[-2]], dim=1)
 		print(encoder_state.shape)
 
 		# Initialize the decoder state using the encoder state
