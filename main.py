@@ -9,11 +9,27 @@ def train(model, dataset):
 def test(model, dataset):
 	return 1
 
-def get_batch(dataset, indices, Sx, Sy):
+def get_batch(dataset, indices, Sx, Sy, x_eos, y_eos):
 	x = []; y = []
+	# convert letters to integers
 	for index in indices:
 		x.append([Sx.index(c) for c in dataset[0][index]])
 		y.append([Sy.index(c) for c in dataset[1][index]])
+
+	# get max sequence length
+	T = max([len(x_) for x_ in x])
+	U = max([len(y_) for y_ in y])
+
+	# pad all sequences with EOS to have same length
+	for index in range(len(x)):
+		x[index] += [x_eos] * T - len(x[index])
+		x[index] = one_hot(x[index], len(Sx))
+		y[index] += [y_eos] * U - len(y[index])
+		y[index] = one_hot(y[index], len(Sy))
+
+	x = torch.stack(x)
+	y = torch.stack(y)
+
 	return (x,y)
 
 # To use a different training text file, just change this path.
@@ -29,6 +45,7 @@ Sy_size = len(Sy) # 82, including EOS
 Sx = [letter for letter in Sy if letter not in "AEIOUaeiou"] # remove vowels from set of possible input letters
 Sx_size = len(Sx) # 72, including EOS
 EOS_token = '\n' # all sequences end with newline
+x_eos = Sx.index(EOS_token)
 y_eos = Sy.index(EOS_token)
 
 total_lines = len(lines)
@@ -57,7 +74,7 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						y_eos=y_eos,
 						dropout=0.5)
 
-x,y = get_batch(train_dataset, [0,1], Sx, Sy)
+x,y = get_batch(train_dataset, [0,1], Sx, Sy, x_eos, y_eos)
 model()
 sys.exit()
 
