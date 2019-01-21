@@ -13,15 +13,15 @@ class EncoderDecoder(torch.nn.Module):
 
 	def forward(self, x, y):
 		"""
-		x : Tensor of shape (batch size, |Sx|, T)
-		y : Tensor of shape (batch size, |Sy|, U) - padded with end-of-sequence tokens
+		x : Tensor of shape (batch size, T, |Sx|)
+		y : Tensor of shape (batch size, U, |Sy|) - padded with end-of-sequence tokens
 
 		Compute log p(y|x) for each (x,y) in the batch.
 		"""
 
 		batch_size = y.shape[0]
-		Sy_size = y.shape[1]
-		U = y.shape[2]
+		U = y.shape[1]
+		Sy_size = y.shape[2]
 
 		# Encode the input sequence into a single fixed-length vector
 		_, encoder_state = self.encoder_rnn(x)
