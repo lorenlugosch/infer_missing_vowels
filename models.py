@@ -10,7 +10,7 @@ class EncoderRNN(torch.nn.Module):
 		"""
 		input: Tensor of shape (batch size, T, |Sx|)
 		
-		Map the input tensor to a fixed-length encoding.
+		Map the input sequence to a fixed-length encoding.
 		"""
 		_, out = self.gru(input)
 		out = torch.cat([out[-1], out[-2]], dim=1)
@@ -53,11 +53,11 @@ class EncoderDecoder(torch.nn.Module):
 	"""
 	Simple encoder-decoder sequence model with fixed-length encoding. 
 	- forward(): computes the probability of an input/output sequence pair.
-	- infer(): generate an output sequence, given the input sequence.
+	- infer(): given the input sequence, infer the most likely output sequence.
 	"""
 	def __init__(self, num_encoder_layers, num_encoder_hidden, num_decoder_layers, num_decoder_hidden, Sx_size, Sy_size, y_eos, dropout):
 		super(EncoderDecoder, self).__init__()
-		self.encoder_rnn = EncoderRNN(num_encoder_layers, num_encoder_hidden)
+		self.encoder_rnn = EncoderRNN(num_encoder_layers, num_encoder_hidden, Sx_size, dropout)
 		self.encoder_linear = torch.nn.Linear(num_encoder_hidden*2, num_decoder_hidden*num_decoder_layers)
 		self.decoder_rnn = DecoderRNN(num_decoder_layers, num_decoder_hidden, Sy_size, dropout)
 		self.decoder_linear = torch.nn.Linear(num_decoder_hidden, Sy_size)
