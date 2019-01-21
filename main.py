@@ -10,8 +10,10 @@ def test(model, dataset):
 	return 1
 
 def get_batch(dataset, indices):
-	x = dataset[0][indices]
-	y = dataset[1][indices]
+	x = []; y = []
+	for index in indices:
+		x.append(dataset[0][index])
+		y.append(dataset[1][index])
 	return (x,y)
 
 # To use a different training text file, just change this path.
