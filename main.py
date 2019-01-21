@@ -53,7 +53,7 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						Sx_size=Sx_size, 
 						Sy_size=Sy_size,
 						y_eos=y_eos,
-						dropout=True)
+						dropout=0.5)
 
 x,y = get_batch(train_dataset, [0,1])
 model()
