@@ -4,29 +4,41 @@ from models import EncoderDecoder
 from helper_functions import one_hot
 
 def train(model, dataset):
+	# shuffle indices
+
+	# 
 	return 1
 
 def test(model, dataset):
 	return 1
 
 def get_batch(dataset, indices, Sx, Sy, x_eos, y_eos):
+	"""
+	dataset: tuple of two lists (input strings, output strings)
+	indices: list of integer indices
+	Sx: list of characters (input alphabet)
+	Sy: list of characters (output alphabet)
+	x_eos: character used to denote input end-of-sequence
+	x_eos: character used to denote output end-of-sequence
+
+	Returns a tuple of two tensors containing formatted inputs and outputs.
+	"""
 	x = []; y = []
 	# convert letters to integers
 	for index in indices:
 		x.append([Sx.index(c) for c in dataset[0][index]])
 		y.append([Sy.index(c) for c in dataset[1][index]])
 
-	# get max sequence length
+	# pad all sequences with EOS to have same length
 	T = max([len(x_) for x_ in x])
 	U = max([len(y_) for y_ in y])
-
-	# pad all sequences with EOS to have same length
 	for index in range(len(x)):
 		x[index] += [x_eos] * (T - len(x[index]))
 		x[index] = torch.tensor(x[index])
 		y[index] += [y_eos] * (U - len(y[index]))
 		y[index] = torch.tensor(y[index])
 
+	# stack into single tensor and one-hot encode integer labels
 	x = one_hot(torch.stack(x), len(Sx))
 	y = one_hot(torch.stack(y), len(Sy))
 
@@ -74,8 +86,9 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						y_eos=y_eos,
 						dropout=0.5)
 
-x,y = get_batch(train_dataset, [0,1], Sx, Sy, x_eos, y_eos)
-model(x,y)
+x,y = get_batch(train_dataset, np.array([0,1]), Sx, Sy, x_eos, y_eos)
+log_probs = model(x,y); U = x.shape[1]
+loss = -log_probs.mean() / U
 sys.exit()
 
 num_epochs = 10
