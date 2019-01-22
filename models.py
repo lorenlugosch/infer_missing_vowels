@@ -100,7 +100,7 @@ class EncoderDecoder(torch.nn.Module):
 			# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
 			decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state))
 			print(decoder_out)
-			log_p_yu = (decoder_out * y[:,u,:]).sum() # y_u is one-hot; use dot-product to select the y_u'th output probability
+			log_p_yu = (decoder_out * y[:,u,:]).sum(dim=2) # y_u is one-hot; use dot-product to select the y_u'th output probability
 			print(log_p_yu)
 
 			# Add log p(y_u|...) to log p(y|x)
