@@ -3,6 +3,17 @@ from collections import Counter
 from models import EncoderDecoder
 from helper_functions import one_hot
 
+# # https://pytorch.org/tutorials/beginner/data_loading_tutorial.html
+# class SentenceDataset(torch.utils.data.Dataset):
+# 	def __init__(self, lines):
+# 		self.lines = lines
+
+# 	def __len__(self):
+#         return len(self.lines)
+
+#     def __getitem__(self, idx):
+#     	return 1
+
 def train(model, dataset):
 	# shuffle indices
 
@@ -60,9 +71,8 @@ EOS_token = '\n' # all sequences end with newline
 x_eos = Sx.index(EOS_token)
 y_eos = Sy.index(EOS_token)
 
-total_lines = len(lines)
-
 # split dataset
+total_lines = len(lines)
 one_tenth = total_lines // 10
 train_labels = lines[0:one_tenth * 8]
 train_input = ["".join(c for c in line if c not in "AEIOUaeiou") for line in train_labels]
@@ -81,12 +91,12 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						num_encoder_hidden=128, 
 						num_decoder_layers=1, 
 						num_decoder_hidden=128, 
-						Sx_size=Sx_size, 
-						Sy_size=Sy_size,
+						Sx_size=len(Sx), 
+						Sy_size=len(Sy),
 						y_eos=y_eos,
 						dropout=0.5)
 
-x,y = get_batch(train_dataset, np.array([0,1]), Sx, Sy, x_eos, y_eos)
+x,y = get_batch(train_dataset, [0,1], Sx, Sy, x_eos, y_eos)
 log_probs = model(x,y); U = x.shape[1]
 loss = -log_probs.mean() / U
 sys.exit()
