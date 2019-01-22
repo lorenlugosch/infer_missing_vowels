@@ -81,6 +81,7 @@ class EncoderDecoder(torch.nn.Module):
 
 		# Initialize the decoder state using the encoder state
 		decoder_state = self.encoder_linear(encoder_state)
+		print(decoder_state)
 
 		# Initialize log p(y|x) to zeros
 		log_p_y_x = torch.zeros(batch_size)
@@ -101,7 +102,6 @@ class EncoderDecoder(torch.nn.Module):
 
 			# Add log p(y_u|...) to log p(y|x)
 			log_p_y_x += log_p_yu
-			print(log_p_y_x)
 
 		return log_p_y_x
 
