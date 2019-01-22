@@ -153,5 +153,4 @@ class EncoderDecoder(torch.nn.Module):
 			y_hat[idx].append(y_hat_u_1.copy())
 
 		return y_hat
-		y_hat = model.infer(x, Sy)
 
