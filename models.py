@@ -90,7 +90,7 @@ class EncoderDecoder(torch.nn.Module):
 				# Feed in 0
 				zeros = torch.zeros(batch_size, Sy_size)
 				if torch.cuda.is_available(): zeros = zeros.cuda() # TODO clean this up
-				decoder_state = self.decoder_rnn(self.input_zeros, decoder_state)
+				decoder_state = self.decoder_rnn(zeros, decoder_state)
 			else:
 				# Feed in the previous element of y; update the decoder state
 				decoder_state = self.decoder_rnn(y[:,u-1,:], decoder_state)

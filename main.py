@@ -34,7 +34,7 @@ total_lines = len(data)
 one_tenth = total_lines // 10
 
 train_dataset = TextDataset(data[0:one_tenth * 8])
-train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=2, num_workers=1, shuffle=True, collate_fn=collate_fn)
+train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, num_workers=1, shuffle=True, collate_fn=collate_fn)
 
 valid_dataset = TextDataset(data[one_tenth * 8: one_tenth * 9])
 test_dataset = TextDataset(data[one_tenth * 9:])
@@ -47,7 +47,8 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						Sx_size=len(Sx), 
 						Sy_size=len(Sy),
 						y_eos=y_eos,
-						dropout=0.5).cuda()
+						dropout=0.5)
+if torch.cuda.is_available(): model = model.cuda()
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 for idx, batch in enumerate(train_data_loader):
@@ -67,5 +68,6 @@ for idx, batch in enumerate(train_data_loader):
 # 	train(model, train_dataset)
 # 	test(model, valid_dataset)
 
-test_input = "Hello, world!"
+test_output = "Hello, world!"
+test_input = "".join([c for c in test_output if c not in "AEIOUaeiou"])
 # print(model.infer(test_input))
