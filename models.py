@@ -83,46 +83,72 @@ class EncoderDecoder(torch.nn.Module):
 		# Initialize the decoder state using the encoder state
 		decoder_state = self.encoder_linear(encoder_state)
 
-		# Initialize log p(y|x) to zeros
+		# Initialize log p(y|x), y_u-1 to zeros
 		log_p_y_x = 0
+		y_u_1 = torch.zeros(batch_size, Sy_size)
+		if torch.cuda.is_available(): y_u_1 = y_u_1.cuda()
 		for u in range(0, U):
-			if u == 0:
-				# Feed in 0
-				zeros = torch.zeros(batch_size, Sy_size)
-				if torch.cuda.is_available(): zeros = zeros.cuda() # TODO clean this up
-				decoder_state = self.decoder_rnn(zeros, decoder_state)
-			else:
-				# Feed in the previous element of y; update the decoder state
-				decoder_state = self.decoder_rnn(y[:,u-1,:], decoder_state)
+			# Feed in the previous element of y; update the decoder state
+			decoder_state = self.decoder_rnn(y_u_1, decoder_state)
 
 			# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
 			decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state))
-			log_p_yu = (decoder_out * y[:,u,:]).sum(dim=1) # y_u is one-hot; use dot-product to select the y_u'th output probability
-			print(y[0,u,:].max(dim=0)[1].item(), end='-', flush=True)
-			print(decoder_out[0].max(dim=0)[1].item(), end=' ', flush=True) 
+			log_p_yu = (decoder_out * y[:,u,:]).sum(dim=1) # y_u is one-hot; use dot-product to select the y_u'th output probability 
 
 			# Add log p(y_u|...) to log p(y|x)
 			log_p_y_x += log_p_yu
 
+			# Look at next element of y
+			y_u_1 = y[:,u,:]
+
 		return log_p_y_x
 
-	def infer(x, B=1):
+	def infer(x, Sy, B=1):
 		"""
 		x : Tensor of shape (batch size, T, |Sx|)
+		Sy : list of characters (output alphabet)
 
 		Run beam search to find y_hat = argmax_y log p(y|x) for every (x) in the batch.
 		(If B = 1, this is equivalent to greedy search.) 
+		TODO implement B > 1
 		"""
-		y_hat = [] # List of guessed outputs for each input in the batch.
+		# y_hat = [] # List of guessed outputs for each input in the batch.
 
-		U_max = 100 # maximum length
-		for x_ in x:
-			done = False
-			beam = []
-			while u < U_max:
-				break
+		# U_max = 100 # maximum length
+		# for x_ in x:
+		# 	done = False
+		# 	beam = []
+		# 	while u < U_max:
+		# 		break
 
-			y_hat.append(beam[0])
+		# 	y_hat.append(beam[0])
+
+		# return y_hat
+
+		batch_size = x.shape[0]
+		Sy_size = len(Sy)
+
+		# Encode the input sequence into a single fixed-length vector
+		encoder_state = self.encoder_rnn(x)
+
+		# Initialize the decoder state using the encoder state
+		decoder_state = self.encoder_linear(encoder_state)
+
+		# Initialize list to empty
+		y_hat = []
+		U_max = 100
+		y_hat_u_1 = torch.zeros(batch_size, Sy_size)
+		if torch.cuda.is_available(): y_hat_u_1 = y_hat_u_1.cuda()
+		for u in range(U_max):
+			# Feed in the previous guess; update the decoder state
+			# decoder_state = self.decoder_rnn(y_hat[:,u-1,:], decoder_state)
+			decoder_state = self.decoder_rnn(y_hat_u_1, decoder_state)
+
+			# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
+			decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state))
+			y_hat_u_1[decoder_out.max(dim=0)[1]] += 1
+			for idx in range(batch_size):
+				y_hat[idx].append(Sy.index(decoder_out.max(dim=0)[1].item()))
 
 		return y_hat
 
