@@ -1,59 +1,7 @@
 import torch
 from collections import Counter
 from models import EncoderDecoder
-from helper_functions import one_hot
-
-import torch.utils.data
-
-class TextDataset(torch.utils.data.Dataset):
-	def __init__(self, lines):
-		self.lines = lines
-
-	def __len__(self):
-		return len(self.lines)
-
-	def __getitem__(self, idx):
-		x = "".join(c for c in lines[idx] if c not in "AEIOUaeiou")
-		y = lines[idx]
-		return (x,y)
-
-class PadAndOneHot:
-	def __init__(self, Sx, Sy, x_eos, y_eos):
-		self.Sx = Sx
-		self.Sy = Sy
-		self.x_eos = x_eos
-		self.y_eos = y_eos
-
-	def __call__(self, batch):
-		"""
-		batch: list of tuples (input string, output string)
-
-		Returns a minibatch of strings, one-hot encoded and padded to have the same length.
-		"""
-		x = []; y = []
-		batch_size = len(batch)
-		for index in range(batch_size):
-			x_,y_ = batch[index]
-
-			# convert letters to integers
-			x.append([self.Sx.index(c) for c in x_])
-			y.append([self.Sy.index(c) for c in x_])
-
-		# pad all sequences with EOS to have same length
-		T = max([len(x_) for x_ in x])
-		U = max([len(y_) for y_ in y])
-		for index in range(batch_size):
-			x[index] += [self.x_eos] * (T - len(x[index]))
-			x[index] = torch.tensor(x[index])
-			y[index] += [self.y_eos] * (U - len(y[index]))
-			y[index] = torch.tensor(y[index])
-
-		# stack into single tensor and one-hot encode integer labels
-		x = one_hot(torch.stack(x), len(Sx))
-		y = one_hot(torch.stack(y), len(Sy))
-
-		return (x,y)
-
+from data import TextDataset, PadAndOneHot
 
 def train(model, dataset):
 	# shuffle indices
@@ -82,14 +30,14 @@ y_eos = Sy.index(EOS_token)
 collate_fn = PadAndOneHot(Sx, Sy, x_eos, y_eos) # function for generating a minibatch from strings
 
 # split dataset
-total_lines = len(lines)
+total_lines = len(data)
 one_tenth = total_lines // 10
 
-train_dataset = TextDataset(lines[0:one_tenth * 8])
+train_dataset = TextDataset(data[0:one_tenth * 8])
 train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=2, num_workers=1, shuffle=True, collate_fn=collate_fn)
 
-valid_dataset = TextDataset(lines[one_tenth * 8: one_tenth * 9])
-test_dataset = TextDataset(lines[one_tenth * 9:])
+valid_dataset = TextDataset(data[one_tenth * 8: one_tenth * 9])
+test_dataset = TextDataset(data[one_tenth * 9:])
 
 # initialize model
 model = EncoderDecoder(	num_encoder_layers=2,
@@ -101,11 +49,15 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						y_eos=y_eos,
 						dropout=0.5)
 
+optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
 for idx, batch in enumerate(train_data_loader):
 	x,y = batch
 	log_probs = model(x,y); U = x.shape[1]
 	loss = -log_probs.mean() / U
-	break
+	optimizer.zero_grad()
+	loss.backward()
+	optimizer.step()
+	print(loss)
 
 # num_epochs = 10
 # for epoch in range(num_epochs):
