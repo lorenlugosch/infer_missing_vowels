@@ -64,6 +64,7 @@ for idx, batch in enumerate(train_data_loader):
 	print(loss)
 	if idx % 20 == 0: 
 		y_hat = model.infer(x, Sy)
+		print("".join([Sy[c] for c in y[0].max(dim=1)[1] if c != 25]))
 		print("".join([Sy[c] for c in y_hat[0].max(dim=1)[1] if c != 25]))
 
 # num_epochs = 10
