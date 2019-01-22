@@ -52,6 +52,9 @@ model = EncoderDecoder(	num_encoder_layers=2,
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 for idx, batch in enumerate(train_data_loader):
 	x,y = batch
+	if torch.cuda.is_available():
+			x = x.cuda()
+			y = y.cuda()
 	log_probs = model(x,y); U = x.shape[1]
 	loss = -log_probs.mean() / U
 	optimizer.zero_grad()
