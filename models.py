@@ -83,8 +83,8 @@ class EncoderDecoder(torch.nn.Module):
 		decoder_state = self.encoder_linear(encoder_state)
 
 		# Initialize log p(y|x) to zeros
-		log_p_y_x = torch.zeros(batch_size)
-		if torch.cuda.is_available(): log_p_y_x = log_p_y_x.cuda()
+		log_p_y_x = 0 #torch.zeros(batch_size)
+		# if torch.cuda.is_available(): log_p_y_x = log_p_y_x.cuda()
 		for u in range(0, U):
 			if u == 0:
 				# Feed in 0
