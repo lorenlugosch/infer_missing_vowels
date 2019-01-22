@@ -155,5 +155,5 @@ class EncoderDecoder(torch.nn.Module):
 		y_hat = torch.cat([y_.unsqueeze(1) for y_ in y_hat], dim=1)
 		return y_hat
 
-		# for i in range(32):
-		# 	print("".join([Sy[c] for c in y_[i].max(dim=1)[1] if c != 25]))
+# for i in range(32):
+# 	print("".join([Sy[c] for c in y_[i].max(dim=1)[1] if c != 25]))
