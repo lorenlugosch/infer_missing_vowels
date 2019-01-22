@@ -150,7 +150,7 @@ class EncoderDecoder(torch.nn.Module):
 			# Find the top output
 			y_hat_u_1 -= y_hat_u_1 # set to zero
 			y_hat_u_1[torch.arange(batch_size), decoder_out.max(dim=1)[1]] = 1.
-			y_hat[idx].append(y_hat_u_1.copy())
+			y_hat.append(y_hat_u_1.copy())
 
 		return y_hat
 
