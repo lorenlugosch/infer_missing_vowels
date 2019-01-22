@@ -37,7 +37,7 @@ class DecoderRNN(torch.nn.Module):
 		
 		Given the input vector, update the hidden state of each decoder layer.
 		"""
-		return self.dropout(self.gru(input, previous_state))
+		return self.gru(input, previous_state)
 		# state = []
 		# batch_size = input.shape[0]
 		# previous_state = previous_state.view(len(layers), batch_size, -1)
