@@ -1,5 +1,6 @@
 import torch
 from helper_functions import one_hot
+import sys
 
 class EncoderRNN(torch.nn.Module):
 	def __init__(self, num_encoder_layers, num_encoder_hidden, input_size, dropout):
@@ -87,10 +88,9 @@ class EncoderDecoder(torch.nn.Module):
 		for u in range(0, U):
 			if u == 0:
 				# Feed in 0
-				# zeros = torch.zeros(batch_size, Sy_size)
-				# if torch.cuda.is_available(): zeros = zeros.cuda() # TODO clean this up
-				# decoder_state = self.decoder_rnn(zeros, decoder_state)
-				decoder_state = self.decoder_rnn(0, decoder_state) 
+				zeros = torch.zeros(batch_size, Sy_size)
+				if torch.cuda.is_available(): zeros = zeros.cuda() # TODO clean this up
+				decoder_state = self.decoder_rnn(zeros, decoder_state)
 			else:
 				# Feed in the previous element of y; update the decoder state
 				decoder_state = self.decoder_rnn(y[:,u-1,:], decoder_state)
@@ -98,6 +98,7 @@ class EncoderDecoder(torch.nn.Module):
 			# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
 			decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state))
 			log_p_yu = (decoder_out * y[:,u,:]).sum(dim=1) # y_u is one-hot; use dot-product to select the y_u'th output probability
+			print(decoder_out[0].max(dim=0), end='', flush=True) 
 
 			# Add log p(y_u|...) to log p(y|x)
 			log_p_y_x += log_p_yu
