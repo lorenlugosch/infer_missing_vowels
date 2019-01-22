@@ -34,7 +34,7 @@ class PadAndOneHot:
 
 			# convert letters to integers
 			x.append([self.Sx.index(c) for c in x_])
-			y.append([self.Sy.index(c) for c in x_])
+			y.append([self.Sy.index(c) for c in y_])
 
 		# pad all sequences with EOS to have same length
 		T = max([len(x_) for x_ in x])
