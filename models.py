@@ -63,8 +63,6 @@ class EncoderDecoder(torch.nn.Module):
 		self.decoder_linear = torch.nn.Linear(num_decoder_hidden, Sy_size)
 		self.decoder_log_softmax = torch.nn.LogSoftmax(dim=1)
 		self.y_eos = y_eos # index of the end-of-sequence token
-		self.input_zeros = torch.zeros(batch_size, Sy_size)
-		self.output_zeros = torch.zeros(batch_size)
 
 	def forward(self, x, y):
 		"""
@@ -85,10 +83,13 @@ class EncoderDecoder(torch.nn.Module):
 		decoder_state = self.encoder_linear(encoder_state)
 
 		# Initialize log p(y|x) to zeros
-		log_p_y_x = self.output_zeros
+		log_p_y_x = torch.zeros(batch_size)
+		if torch.cuda.is_available(): log_p_y_x = log_p_y_x.cuda()
 		for u in range(0, U):
 			if u == 0:
 				# Feed in 0
+				zeros = torch.zeros(batch_size, Sy_size)
+				if torch.cuda.is_available(): zeros = zeros.cuda() # TODO clean this up
 				decoder_state = self.decoder_rnn(self.input_zeros, decoder_state)
 			else:
 				# Feed in the previous element of y; update the decoder state

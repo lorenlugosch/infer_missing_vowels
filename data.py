@@ -48,5 +48,8 @@ class PadAndOneHot:
 		# stack into single tensor and one-hot encode integer labels
 		x = one_hot(torch.stack(x), len(self.Sx))
 		y = one_hot(torch.stack(y), len(self.Sy))
+		if torch.cuda.is_available():
+			x = x.cuda()
+			y = y.cuda()
 
 		return (x,y)
