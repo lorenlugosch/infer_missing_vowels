@@ -20,7 +20,8 @@ class EncoderRNN(torch.nn.Module):
 class DecoderRNN(torch.nn.Module):
 	def __init__(self, num_decoder_layers, num_decoder_hidden, input_size, dropout):
 		super(DecoderRNN, self).__init__()
-		self.gru = torch.nn.GRUCell(input_size=input_size, hidden_size=num_decoder_hidden) 
+		self.gru = torch.nn.GRUCell(input_size=input_size, hidden_size=num_decoder_hidden)
+		self.dropout = torch.nn.Dropout(dropout)
 		# self.layers = []
 		# for index in range(num_decoder_layers):
 		# 	if index == 0: 
@@ -36,7 +37,7 @@ class DecoderRNN(torch.nn.Module):
 		
 		Given the input vector, update the hidden state of each decoder layer.
 		"""
-		return self.gru(input, previous_state)
+		return self.dropout(self.gru(input, previous_state))
 		# state = []
 		# batch_size = input.shape[0]
 		# previous_state = previous_state.view(len(layers), batch_size, -1)

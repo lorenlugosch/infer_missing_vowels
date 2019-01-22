@@ -65,8 +65,10 @@ for epoch in range(num_epochs):
 		loss.backward()
 		optimizer.step()
 		print(loss)
-		if idx % 20 == 0: 
+		if idx % 20 == 0:
+			model.eval()
 			y_hat = model.infer(x, Sy)
+			model.train()
 			print("".join([Sy[c] for c in y[0].max(dim=1)[1] if c != 25]))
 			print("".join([Sy[c] for c in y_hat[0].max(dim=1)[1] if c != 25]))
 
