@@ -51,26 +51,24 @@ model = EncoderDecoder(	num_encoder_layers=2,
 if torch.cuda.is_available(): model = model.cuda()
 
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-for idx, batch in enumerate(train_data_loader):
-	x,y = batch
-	if torch.cuda.is_available():
-			x = x.cuda()
-			y = y.cuda()
-	log_probs = model(x,y); U = y.shape[1]
-	loss = -log_probs.mean() / U
-	optimizer.zero_grad()
-	loss.backward()
-	optimizer.step()
-	print(loss)
-	if idx % 20 == 0: 
-		y_hat = model.infer(x, Sy)
-		print("".join([Sy[c] for c in y[0].max(dim=1)[1] if c != 25]))
-		print("".join([Sy[c] for c in y_hat[0].max(dim=1)[1] if c != 25]))
 
-# num_epochs = 10
-# for epoch in range(num_epochs):
-# 	train(model, train_dataset)
-# 	test(model, valid_dataset)
+num_epochs = 10
+for epoch in range(num_epochs):
+	for idx, batch in enumerate(train_data_loader):
+		x,y = batch
+		if torch.cuda.is_available():
+				x = x.cuda()
+				y = y.cuda()
+		log_probs = model(x,y); U = y.shape[1]
+		loss = -log_probs.mean() / U
+		optimizer.zero_grad()
+		loss.backward()
+		optimizer.step()
+		print(loss)
+		if idx % 20 == 0: 
+			y_hat = model.infer(x, Sy)
+			print("".join([Sy[c] for c in y[0].max(dim=1)[1] if c != 25]))
+			print("".join([Sy[c] for c in y_hat[0].max(dim=1)[1] if c != 25]))
 
 test_output = "Hello, world!"
 test_input = "".join([c for c in test_output if c not in "AEIOUaeiou"])
