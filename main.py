@@ -47,7 +47,7 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						Sx_size=len(Sx), 
 						Sy_size=len(Sy),
 						y_eos=y_eos,
-						dropout=0.5)
+						dropout=0.5).cuda()
 
 optimizer = torch.optim.adam(model.parameters(), lr=0.001)
 for idx, batch in enumerate(train_data_loader):
