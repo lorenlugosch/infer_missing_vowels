@@ -3,16 +3,56 @@ from collections import Counter
 from models import EncoderDecoder
 from helper_functions import one_hot
 
-# # https://pytorch.org/tutorials/beginner/data_loading_tutorial.html
-# class SentenceDataset(torch.utils.data.Dataset):
-# 	def __init__(self, lines):
-# 		self.lines = lines
+# https://pytorch.org/tutorials/beginner/data_loading_tutorial.html
+class TextDataset(torch.utils.data.Dataset):
+	def __init__(self, lines):
+		self.lines = lines
 
-# 	def __len__(self):
-#         return len(self.lines)
+	def __len__(self):
+        return len(self.lines)
 
-#     def __getitem__(self, idx):
-#     	return 1
+    def __getitem__(self, idx):
+    	x = "".join(c for c in lines[idx] if c not in "AEIOUaeiou")
+    	y = lines[idx]
+    	return (x,y)
+
+class PadAndOneHot:
+	def __init__(self, Sx, Sy, x_eos, y_eos):
+		self.Sx = Sx
+		self.Sy = Sy
+		self.x_eos = x_eos
+		self.y_eos = y_eos
+
+	def __call__(self, batch):
+		"""
+		batch: list of tuples (input string, output string)
+
+		Returns a minibatch of strings, one-hot encoded and padded to have the same length.
+		"""
+		x = []; y = []
+		batch_size = len(batch)
+		for index in range(batch_size):
+			x_,y_ = batch[index]
+
+			# convert letters to integers
+			x.append([self.Sx.index(c) for c in x_])
+			y.append([self.Sy.index(c) for c in x_])
+
+		# pad all sequences with EOS to have same length
+		T = max([len(x_) for x_ in x])
+		U = max([len(y_) for y_ in y])
+		for index in range(batch_size):
+			x[index] += [self.x_eos] * (T - len(x[index]))
+			x[index] = torch.tensor(x[index])
+			y[index] += [self.y_eos] * (U - len(y[index]))
+			y[index] = torch.tensor(y[index])
+
+		# stack into single tensor and one-hot encode integer labels
+		x = one_hot(torch.stack(x), len(Sx))
+		y = one_hot(torch.stack(y), len(Sy))
+
+		return (x,y)
+
 
 def train(model, dataset):
 	# shuffle indices
@@ -22,38 +62,6 @@ def train(model, dataset):
 
 def test(model, dataset):
 	return 1
-
-def get_batch(dataset, indices, Sx, Sy, x_eos, y_eos):
-	"""
-	dataset: tuple of two lists (input strings, output strings)
-	indices: list of integer indices
-	Sx: list of characters (input alphabet)
-	Sy: list of characters (output alphabet)
-	x_eos: character used to denote input end-of-sequence
-	x_eos: character used to denote output end-of-sequence
-
-	Returns a tuple of two tensors containing formatted inputs and outputs.
-	"""
-	x = []; y = []
-	# convert letters to integers
-	for index in indices:
-		x.append([Sx.index(c) for c in dataset[0][index]])
-		y.append([Sy.index(c) for c in dataset[1][index]])
-
-	# pad all sequences with EOS to have same length
-	T = max([len(x_) for x_ in x])
-	U = max([len(y_) for y_ in y])
-	for index in range(len(x)):
-		x[index] += [x_eos] * (T - len(x[index]))
-		x[index] = torch.tensor(x[index])
-		y[index] += [y_eos] * (U - len(y[index]))
-		y[index] = torch.tensor(y[index])
-
-	# stack into single tensor and one-hot encode integer labels
-	x = one_hot(torch.stack(x), len(Sx))
-	y = one_hot(torch.stack(y), len(Sy))
-
-	return (x,y)
 
 # To use a different training text file, just change this path.
 # Each line separated by '\n' will be used as one training example.
@@ -70,21 +78,17 @@ Sx_size = len(Sx) # 72, including EOS
 EOS_token = '\n' # all sequences end with newline
 x_eos = Sx.index(EOS_token)
 y_eos = Sy.index(EOS_token)
+collate_fn = PadAndOneHot(Sx, Sy, x_eos, y_eos) # function for generating a minibatch from strings
 
 # split dataset
 total_lines = len(lines)
 one_tenth = total_lines // 10
-train_labels = lines[0:one_tenth * 8]
-train_input = ["".join(c for c in line if c not in "AEIOUaeiou") for line in train_labels]
-train_dataset = (train_input, train_labels)
 
-valid_labels = lines[one_tenth * 8: one_tenth * 9]
-valid_input = ["".join(c for c in line if c not in "AEIOUaeiou") for line in valid_labels]
-valid_dataset = (valid_input, valid_labels)
+train_dataset = TextDataset(lines[0:one_tenth * 8])
+train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=2, num_workers=1, shuffle=True)
 
-test_labels = lines[one_tenth * 9:]
-test_input = ["".join(c for c in line if c not in "AEIOUaeiou") for line in test_labels]
-test_dataset = (test_input, test_labels)
+valid_dataset = TextDataset(lines[one_tenth * 8: one_tenth * 9])
+test_dataset = TextDataset(lines[one_tenth * 9:])
 
 # initialize model
 model = EncoderDecoder(	num_encoder_layers=2,
