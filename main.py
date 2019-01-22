@@ -56,12 +56,13 @@ for idx, batch in enumerate(train_data_loader):
 	if torch.cuda.is_available():
 			x = x.cuda()
 			y = y.cuda()
-	log_probs = model(x,y); U = x.shape[1]
+	log_probs = model(x,y); U = y.shape[1]
 	loss = -log_probs.mean() / U
 	optimizer.zero_grad()
 	loss.backward()
 	optimizer.step()
 	print(loss)
+	break
 
 # num_epochs = 10
 # for epoch in range(num_epochs):

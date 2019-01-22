@@ -101,6 +101,7 @@ class EncoderDecoder(torch.nn.Module):
 
 			# Add log p(y_u|...) to log p(y|x)
 			log_p_y_x += log_p_yu
+			print(log_p_y_x)
 
 		return log_p_y_x
 
@@ -118,7 +119,7 @@ class EncoderDecoder(torch.nn.Module):
 			done = False
 			beam = []
 			while u < U_max:
-				1
+				break
 
 			y_hat.append(beam[0])
 
