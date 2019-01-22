@@ -15,11 +15,11 @@ def test(model, dataset):
 # To use a different training text file, just change this path.
 # Each line separated by '\n' will be used as one training example.
 with open("war_and_peace.txt", "r") as f:
-	lines = f.readlines()
-lines[-1] += '\n'
+	data = f.readlines()
+data[-1] += '\n'
 
 # get size of input and output alphabets
-c = Counter(("".join(lines)))
+c = Counter(("".join(data)))
 Sy = list(c.keys()) # set of possible output letters
 Sy_size = len(Sy) # 82, including EOS
 Sx = [letter for letter in Sy if letter not in "AEIOUaeiou"] # remove vowels from set of possible input letters
