@@ -49,7 +49,7 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						y_eos=y_eos,
 						dropout=0.5).cuda()
 
-optimizer = torch.optim.adam(model.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 for idx, batch in enumerate(train_data_loader):
 	x,y = batch
 	log_probs = model(x,y); U = x.shape[1]
