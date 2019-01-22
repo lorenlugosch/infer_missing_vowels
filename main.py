@@ -62,7 +62,6 @@ for idx, batch in enumerate(train_data_loader):
 	loss.backward()
 	optimizer.step()
 	print(loss)
-	break
 
 # num_epochs = 10
 # for epoch in range(num_epochs):
