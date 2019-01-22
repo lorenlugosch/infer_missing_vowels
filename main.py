@@ -86,7 +86,7 @@ total_lines = len(lines)
 one_tenth = total_lines // 10
 
 train_dataset = TextDataset(lines[0:one_tenth * 8])
-train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=2, num_workers=1, shuffle=True)
+train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=2, num_workers=1, shuffle=True, collate_fn=collate_fn)
 
 valid_dataset = TextDataset(lines[one_tenth * 8: one_tenth * 9])
 test_dataset = TextDataset(lines[one_tenth * 9:])
@@ -101,15 +101,16 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						y_eos=y_eos,
 						dropout=0.5)
 
-x,y = get_batch(train_dataset, [0,1], Sx, Sy, x_eos, y_eos)
-log_probs = model(x,y); U = x.shape[1]
-loss = -log_probs.mean() / U
-sys.exit()
+for idx, batch in enumerate(train_data_loader):
+	x,y = batch
+	log_probs = model(x,y); U = x.shape[1]
+	loss = -log_probs.mean() / U
+	break
 
-num_epochs = 10
-for epoch in range(num_epochs):
-	train(model, train_dataset)
-	test(model, valid_dataset)
+# num_epochs = 10
+# for epoch in range(num_epochs):
+# 	train(model, train_dataset)
+# 	test(model, valid_dataset)
 
 test_input = "Hello, world!"
 # print(model.infer(test_input))
