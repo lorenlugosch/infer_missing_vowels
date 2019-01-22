@@ -3,7 +3,8 @@ from collections import Counter
 from models import EncoderDecoder
 from helper_functions import one_hot
 
-# https://pytorch.org/tutorials/beginner/data_loading_tutorial.html
+import torch.utils.data
+
 class TextDataset(torch.utils.data.Dataset):
 	def __init__(self, lines):
 		self.lines = lines
