@@ -46,7 +46,7 @@ class PadAndOneHot:
 			y[index] = torch.tensor(y[index])
 
 		# stack into single tensor and one-hot encode integer labels
-		x = one_hot(torch.stack(x), len(Sx))
-		y = one_hot(torch.stack(y), len(Sy))
+		x = one_hot(torch.stack(x), len(self.Sx))
+		y = one_hot(torch.stack(y), len(self.Sy))
 
 		return (x,y)
