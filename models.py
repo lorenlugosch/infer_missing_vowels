@@ -99,6 +99,7 @@ class EncoderDecoder(torch.nn.Module):
 			print(decoder_state)
 			# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
 			decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state))
+			print(decoder_out)
 			log_p_yu = (decoder_out * y[:,u,:]).sum() # y_u is one-hot; use dot-product to select the y_u'th output probability
 
 			# Add log p(y_u|...) to log p(y|x)
@@ -108,7 +109,7 @@ class EncoderDecoder(torch.nn.Module):
 
 	def infer(x, B=1):
 		"""
-		x : Tensor of shape (batch size, |Sx|, T)
+		x : Tensor of shape (batch size, T, |Sx|)
 
 		Run beam search to find y_hat = argmax_y log p(y|x) for every (x) in the batch.
 		(If B = 1, this is equivalent to greedy search.) 
