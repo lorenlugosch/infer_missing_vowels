@@ -66,7 +66,7 @@ for epoch in range(num_epochs):
 		loss.backward()
 		optimizer.step()
 		model.eval(); y_hat = model.infer(x, Sy); model.train()
-		train_loss += loss.cpu().data.numpy()[0] * batch_size
+		train_loss += loss.cpu().data.numpy().item() * batch_size
 		# train_acc += edit_distance(y,y_hat) * batch_size
 
 		# print out the model's guess, to see how well it's learning
@@ -92,7 +92,7 @@ for epoch in range(num_epochs):
 		log_probs = model(x,y); U = y.shape[1]
 		loss = -log_probs.mean() / U
 		y_hat = model.infer(x, Sy)
-		valid_loss += loss.cpu().data.numpy()[0] * batch_size
+		valid_loss += loss.cpu().data.numpy().item() * batch_size
 		# valid_acc += edit_distance(y,y_hat) * batch_size
 	valid_loss /= num_samples
 	valid_acc /= num_samples
