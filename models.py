@@ -13,9 +13,9 @@ class EncoderRNN(torch.nn.Module):
 		
 		Map the input sequence to a fixed-length encoding.
 		"""
-		_, out = self.gru(input)
-		out = torch.cat([out[-1], out[-2]], dim=1)
-		return out
+		_, final_state = self.gru(input)
+		final_state = torch.cat([final_state[-1], final_state[-2]], dim=1)
+		return final_state
 
 class DecoderRNN(torch.nn.Module):
 	def __init__(self, num_decoder_layers, num_decoder_hidden, input_size, dropout):

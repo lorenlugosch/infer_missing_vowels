@@ -1,4 +1,5 @@
 import torch
+from tqdm import tqdm # for displaying progress bar
 
 class Trainer:
 	def __init__(self, model, lr):
@@ -11,7 +12,8 @@ class Trainer:
 		train_loss = 0
 		num_samples = 0
 		self.model.train()
-		for idx, batch in enumerate(dataset.loader):
+		# for idx, batch in enumerate(dataset.loader):
+		for idx, batch in enumerate(tqdm(dataset.loader)):
 			x,y = batch
 			batch_size = len(x)
 			num_samples += batch_size
