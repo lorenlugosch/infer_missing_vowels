@@ -9,23 +9,13 @@ with open("war_and_peace.txt", "r") as f:
 	data = f.readlines()
 data[-1] += '\n'
 
-# get size of input and output alphabets
-c = Counter(("".join(data)))
-Sy = list(c.keys()) # set of possible output letters
-Sy_size = len(Sy) # 82, including EOS
-Sx = [letter for letter in Sy if letter not in "AEIOUaeiou"] # remove vowels from set of possible input letters
-Sx_size = len(Sx) # 72, including EOS
-EOS_token = '\n' # all sequences end with newline
-x_eos = Sx.index(EOS_token)
-y_eos = Sy.index(EOS_token)
-pad_and_one_hot = PadAndOneHot(Sx, Sy, x_eos, y_eos) # function for generating a minibatch from strings
-
 # split dataset
 total_lines = len(data)
 one_tenth = total_lines // 10
 
 train_dataset = TextDataset(data[0:one_tenth * 8])
 train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, num_workers=1, shuffle=True, collate_fn=pad_and_one_hot)
+# train_data_loader = train_dataset.loader
 
 valid_dataset = TextDataset(data[one_tenth * 8: one_tenth * 9])
 valid_data_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=32, num_workers=1, shuffle=True, collate_fn=pad_and_one_hot)
@@ -37,8 +27,8 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						num_encoder_hidden=128, 
 						num_decoder_layers=1, 
 						num_decoder_hidden=128, 
-						Sx_size=len(Sx), 
-						Sy_size=len(Sy),
+						Sx_size=len(train_dataset.Sx), 
+						Sy_size=len(train_dataset.Sy),
 						y_eos=y_eos,
 						dropout=0.5)
 if torch.cuda.is_available(): model = model.cuda()
@@ -99,10 +89,9 @@ for epoch in range(num_epochs):
 	valid_loss /= num_samples
 	valid_acc /= num_samples
 
-	test_output = "Hello, world!\n"
-	test_input = "".join([c for c in test_output if c not in "AEIOUaeiou"])
-
 	#############################
+	test_output = "Hello, world!\n"
+	test_input = 'Hll, wrld!\n' #"".join([c for c in test_output if c not in "AEIOUaeiou"])
 	x,y = pad_and_one_hot([(test_input, test_output)])
 	y_hat = model.infer(x.cuda(), Sy)
 	print("input: " + "".join([Sx[c] for c in x[0].max(dim=1)[1] if c != x_eos]))
@@ -114,3 +103,4 @@ for epoch in range(num_epochs):
 	print("train accuracy: %.2f| train loss: %.2f| valid accuracy: %.2f| valid loss: %.2f" % (train_acc, train_loss, valid_acc, valid_loss) )
 	print("")
 
+	torch.save(model, "model.pth")

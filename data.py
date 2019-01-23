@@ -5,6 +5,18 @@ from helper_functions import one_hot
 class TextDataset(torch.utils.data.Dataset):
 	def __init__(self, lines):
 		self.lines = lines
+		
+		# get size of input and output alphabets
+		c = Counter(("".join(lines)))
+		Sy = list(c.keys()) # set of possible output letters
+		Sy_size = len(Sy) # 82, including EOS
+		Sx = [letter for letter in Sy if letter not in "AEIOUaeiou"] # remove vowels from set of possible input letters
+		Sx_size = len(Sx) # 72, including EOS
+		EOS_token = '\n' # all sequences end with newline
+		x_eos = Sx.index(EOS_token)
+		y_eos = Sy.index(EOS_token)
+		self.pad_and_one_hot = PadAndOneHot(Sx, Sy, x_eos, y_eos) # function for generating a minibatch from strings
+		self.loader = torch.utils.data.DataLoader(self, batch_size=32, num_workers=1, shuffle=True, collate_fn=self.pad_and_one_hot)
 
 	def __len__(self):
 		return len(self.lines)
