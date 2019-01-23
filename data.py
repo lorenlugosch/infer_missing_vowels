@@ -11,8 +11,8 @@ class TextDataset(torch.utils.data.Dataset):
 		self.Sy = list(Counter(("".join(lines))).keys()) # set of possible output letters
 		self.Sx = [letter for letter in self.Sy if letter not in "AEIOUaeiou"] # remove vowels from set of possible input letters
 		EOS_token = '\n' # all sequences end with newline
-		self.x_eos = Sx.index(EOS_token)
-		self.y_eos = Sy.index(EOS_token)
+		self.x_eos = self.Sx.index(EOS_token)
+		self.y_eos = self.Sy.index(EOS_token)
 		pad_and_one_hot = PadAndOneHot(self.Sx, self.Sy, self.x_eos, self.y_eos) # function for generating a minibatch from strings
 		self.loader = torch.utils.data.DataLoader(self, batch_size=32, num_workers=1, shuffle=True, collate_fn=pad_and_one_hot)
 
