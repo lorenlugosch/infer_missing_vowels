@@ -10,7 +10,7 @@ def get_datasets(path):
 
 	# get input and output alphabets
 	Sy = list(Counter(("".join(lines))).keys()) # set of possible output letters
-	Sx = [letter for letter in self.Sy if letter not in "AEIOUaeiou"] # remove vowels from set of possible input letters
+	Sx = [letter for letter in Sy if letter not in "AEIOUaeiou"] # remove vowels from set of possible input letters
 
 	# split dataset
 	total_lines = len(lines)
