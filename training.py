@@ -15,9 +15,6 @@ class Trainer:
 			x,y = batch
 			batch_size = len(x)
 			num_samples += batch_size
-			# if torch.cuda.is_available(): # move to inside of model.forward()?
-			# 		x = x.cuda()
-			# 		y = y.cuda()
 			log_probs = self.model(x,y); U = y.shape[1]
 			loss = -log_probs.mean() / U
 			self.optimizer.zero_grad()
@@ -46,10 +43,7 @@ class Trainer:
 			x,y = batch
 			batch_size = len(x)
 			num_samples += batch_size
-			# if torch.cuda.is_available():
-			# 		x = x.cuda()
-			# 		y = y.cuda()
-			log_probs = model(x,y); U = y.shape[1]
+			log_probs = self.model(x,y); U = y.shape[1]
 			loss = -log_probs.mean() / U
 			y_hat = self.model.infer(x, Sy)
 			test_loss += loss.cpu().data.numpy().item() * batch_size
