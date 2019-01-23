@@ -57,6 +57,7 @@ for epoch in range(num_epochs):
 	for idx, batch in enumerate(train_data_loader):
 		x,y = batch
 		batch_size = len(x)
+		num_samples += batch_size
 		if torch.cuda.is_available():
 				x = x.cuda()
 				y = y.cuda()
