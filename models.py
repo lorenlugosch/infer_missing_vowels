@@ -73,6 +73,9 @@ class EncoderDecoder(torch.nn.Module):
 
 		Compute log p(y|x) for each (x,y) in the batch.
 		"""
+		if torch.cuda.is_available():
+			x = x.cuda()
+			y = y.cuda()
 
 		batch_size = y.shape[0]
 		U = y.shape[1]
@@ -125,6 +128,9 @@ class EncoderDecoder(torch.nn.Module):
 		# 	y_hat.append(beam[0])
 
 		# return y_hat
+
+		if torch.cuda.is_available():
+			x = x.cuda()
 
 		batch_size = x.shape[0]
 		Sy_size = len(Sy)

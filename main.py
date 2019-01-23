@@ -19,29 +19,25 @@ if torch.cuda.is_available(): model = model.cuda()
 
 trainer = Trainer(model, lr=0.001)
 
-num_epochs = 10
+num_epochs = 20
 for epoch in range(num_epochs):
 	print("========= Epoch %d of %d =========" % (epoch, num_epochs))
-
-	# train
 	train_acc, train_loss = trainer.train(train_dataset)
-
-	# valid
 	valid_acc, valid_loss = trainer.test(valid_dataset)
 
-	#############################
-	test_output = "Hello, world!\n"
-	test_input = 'Hll, wrld!\n' #"".join([c for c in test_output if c not in "AEIOUaeiou"])
-	x,y = pad_and_one_hot([(test_input, test_output)])
-	if torch.cuda.is_available(): x = x.cuda()
-	y_hat = model.infer(x, Sy)
-	print("input: " + "".join([Sx[c] for c in x[0].max(dim=1)[1] if c != x_eos]))
-	print("truth: " + "".join([Sy[c] for c in y[0].max(dim=1)[1] if c != y_eos]))
-	print("guess: " + "".join([Sy[c] for c in y_hat[0].max(dim=1)[1] if c != y_eos]))
-	#############################
-
 	print("========= Results: epoch %d of %d =========" % (epoch, num_epochs))
-	print("train accuracy: %.2f| train loss: %.2f| valid accuracy: %.2f| valid loss: %.2f" % (train_acc, train_loss, valid_acc, valid_loss) )
-	print("")
+	print("train accuracy: %.2f| train loss: %.2f| valid accuracy: %.2f| valid loss: %.2f\n" % (train_acc, train_loss, valid_acc, valid_loss) )
 
 	torch.save(model, "model.pth")
+
+#############################
+# test_output = "Hello, world!\n"
+# test_input = 'Hll, wrld!\n' #"".join([c for c in test_output if c not in "AEIOUaeiou"])
+# x,y = pad_and_one_hot([(test_input, test_output)])
+# if torch.cuda.is_available(): x = x.cuda()
+# y_hat = model.infer(x, Sy)
+# print("input: " + "".join([Sx[c] for c in x[0].max(dim=1)[1] if c != x_eos]))
+# print("truth: " + "".join([Sy[c] for c in y[0].max(dim=1)[1] if c != y_eos]))
+# print("guess: " + "".join([Sy[c] for c in y_hat[0].max(dim=1)[1] if c != y_eos]))
+# print("")
+# #############################
