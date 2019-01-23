@@ -38,7 +38,7 @@ model = EncoderDecoder(	num_encoder_layers=2,
 if torch.cuda.is_available(): model = model.cuda()
 
 # optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-trainer = training.Trainer(model, lr=0.001)
+trainer = Trainer(model, lr=0.001)
 
 num_epochs = 10
 for epoch in range(num_epochs):
