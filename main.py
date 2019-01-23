@@ -74,6 +74,7 @@ for epoch in range(num_epochs):
 			print("input: " + "".join([Sx[c] for c in x[0].max(dim=1)[1] if c != x_eos]))
 			print("truth: " + "".join([Sy[c] for c in y[0].max(dim=1)[1] if c != y_eos]))
 			print("guess: " + "".join([Sy[c] for c in y_hat[0].max(dim=1)[1] if c != y_eos]))
+			print("")
 	train_loss /= num_samples
 	train_acc /= num_samples
 
