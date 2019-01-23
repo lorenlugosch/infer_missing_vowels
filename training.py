@@ -1,5 +1,6 @@
 import torch
 from tqdm import tqdm # for displaying progress bar
+from helper_functions import one_hot_to_string
 
 class Trainer:
 	def __init__(self, model, lr):
@@ -28,9 +29,13 @@ class Trainer:
 
 			# print out the model's guess, to see how well it's learning
 			if idx % print_interval == 0:
-				print("input: " + "".join([dataset.Sx[c] for c in x[0].max(dim=1)[1] if c != dataset.x_eos]))
-				print("truth: " + "".join([dataset.Sy[c] for c in y[0].max(dim=1)[1] if c != dataset.y_eos]))
-				print("guess: " + "".join([dataset.Sy[c] for c in y_hat[0].max(dim=1)[1] if c != dataset.y_eos]))
+				# print("input: " + "".join([dataset.Sx[c] for c in x[0].max(dim=1)[1] if c != dataset.x_eos]))
+				# print("truth: " + "".join([dataset.Sy[c] for c in y[0].max(dim=1)[1] if c != dataset.y_eos]))
+				# print("guess: " + "".join([dataset.Sy[c] for c in y_hat[0].max(dim=1)[1] if c != dataset.y_eos]))
+				# print("")
+				print("input: " + one_hot_to_string(x[0], Sx))
+				print("truth: " + one_hot_to_string(y[0], Sy))
+				print("guess: " + one_hot_to_string(y_hat[0], Sy))
 				print("")
 		train_loss /= num_samples
 		train_acc /= num_samples

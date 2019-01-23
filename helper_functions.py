@@ -13,3 +13,9 @@ def one_hot(letters, S):
 			out[i, t, letters[i,t]] = 1
 	return out
 
+def one_hot_to_string(input, S):
+	"""
+	input : Tensor of shape (T, |Sx|)
+	S : list of characters (alphabet, Sx or Sy)
+	"""
+	return "".join([S[c] for c in input.max(dim=1)[1]])
