@@ -29,9 +29,9 @@ class Trainer:
 
 			# print out the model's guess, to see how well it's learning
 			if idx % 20 == 0:
-				print("input: " + "".join([dataset.Sx[c] for c in x[0].max(dim=1)[1] if c != x_eos]))
-				print("truth: " + "".join([dataset.Sy[c] for c in y[0].max(dim=1)[1] if c != y_eos]))
-				print("guess: " + "".join([dataset.Sy[c] for c in y_hat[0].max(dim=1)[1] if c != y_eos]))
+				print("input: " + "".join([dataset.Sx[c] for c in x[0].max(dim=1)[1] if c != dataset.x_eos]))
+				print("truth: " + "".join([dataset.Sy[c] for c in y[0].max(dim=1)[1] if c != dataset.y_eos]))
+				print("guess: " + "".join([dataset.Sy[c] for c in y_hat[0].max(dim=1)[1] if c != dataset.y_eos]))
 				print("")
 		train_loss /= num_samples
 		train_acc /= num_samples
