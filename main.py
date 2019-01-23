@@ -1,39 +1,44 @@
 import torch
 from models import EncoderDecoder
-from data import TextDataset, PadAndOneHot
+from data import get_datasets, PadAndOneHot
+from training import Trainer
 
 # To use a different training text file, just change this path.
 # Each line separated by '\n' will be used as one training example.
-with open("war_and_peace.txt", "r") as f:
-	data = f.readlines()
-data[-1] += '\n'
+# with open("war_and_peace.txt", "r") as f:
+# 	data = f.readlines()
+# data[-1] += '\n'
 
-# split dataset
-total_lines = len(data)
-one_tenth = total_lines // 10
+# # split dataset
+# total_lines = len(data)
+# one_tenth = total_lines // 10
 
-train_dataset = TextDataset(data[0:one_tenth * 8])
-# train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, num_workers=1, shuffle=True, collate_fn=pad_and_one_hot)
+# train_dataset = TextDataset(data[0:one_tenth * 8])
+# # train_data_loader = train_dataset.loader
+
+# valid_dataset = TextDataset(data[one_tenth * 8: one_tenth * 9])
+# # valid_data_loader = valid_dataset.loader
+
+# test_dataset = TextDataset(data[one_tenth * 9:])
+
+path = "war_and_peace.txt"
+train_dataset, valid_dataset, test_dataset = get_datasets(path)
 train_data_loader = train_dataset.loader
-
-valid_dataset = TextDataset(data[one_tenth * 8: one_tenth * 9])
-# valid_data_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=32, num_workers=1, shuffle=True, collate_fn=pad_and_one_hot)
 valid_data_loader = valid_dataset.loader
-
-test_dataset = TextDataset(data[one_tenth * 9:])
 
 # initialize model
 model = EncoderDecoder(	num_encoder_layers=2,
 						num_encoder_hidden=128, 
 						num_decoder_layers=1, 
-						num_decoder_hidden=128, 
-						Sx_size=len(train_dataset.Sx), 
-						Sy_size=len(train_dataset.Sy),
-						y_eos=y_eos,
+						num_decoder_hidden=128,
+						Sx_size=len(train_dataset.Sx),	# input alphabet
+						Sy_size=len(train_dataset.Sy),	# output alphabet
+						y_eos=train_dataset.y_eos,		# index of end-of-sequence symbol for output
 						dropout=0.5)
 if torch.cuda.is_available(): model = model.cuda()
 
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+# optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+trainer = training.Trainer(model, lr=0.001)
 
 num_epochs = 10
 for epoch in range(num_epochs):
@@ -48,7 +53,7 @@ for epoch in range(num_epochs):
 		x,y = batch
 		batch_size = len(x)
 		num_samples += batch_size
-		if torch.cuda.is_available():
+		if torch.cuda.is_available(): # move to inside of model.forward()?
 				x = x.cuda()
 				y = y.cuda()
 		log_probs = model(x,y); U = y.shape[1]
@@ -93,7 +98,8 @@ for epoch in range(num_epochs):
 	test_output = "Hello, world!\n"
 	test_input = 'Hll, wrld!\n' #"".join([c for c in test_output if c not in "AEIOUaeiou"])
 	x,y = pad_and_one_hot([(test_input, test_output)])
-	y_hat = model.infer(x.cuda(), Sy)
+	if torch.cuda.is_available(): x = x.cuda()
+	y_hat = model.infer(x, Sy)
 	print("input: " + "".join([Sx[c] for c in x[0].max(dim=1)[1] if c != x_eos]))
 	print("truth: " + "".join([Sy[c] for c in y[0].max(dim=1)[1] if c != y_eos]))
 	print("guess: " + "".join([Sy[c] for c in y_hat[0].max(dim=1)[1] if c != y_eos]))
