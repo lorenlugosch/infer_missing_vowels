@@ -99,15 +99,18 @@ for epoch in range(num_epochs):
 	valid_loss /= num_samples
 	valid_acc /= num_samples
 
+	test_output = "Hello, world!\n"
+	test_input = "".join([c for c in test_output if c not in "AEIOUaeiou"])
+
+	#############################
+	x,y = pad_and_one_hot([(test_input, test_output)])
+	y_hat = model.infer(x.cuda(), Sy)
+	print("input: " + "".join([Sx[c] for c in x[0].max(dim=1)[1] if c != x_eos]))
+	print("truth: " + "".join([Sy[c] for c in y[0].max(dim=1)[1] if c != y_eos]))
+	print("guess: " + "".join([Sy[c] for c in y_hat[0].max(dim=1)[1] if c != y_eos]))
+	#############################
+
 	print("========= Results: epoch %d of %d =========" % (epoch, num_epochs))
 	print("train accuracy: %.2f| train loss: %.2f| valid accuracy: %.2f| valid loss: %.2f" % (train_acc, train_loss, valid_acc, valid_loss) )
 	print("")
 
-test_output = "Hello, world!"
-test_input = "".join([c for c in test_output if c not in "AEIOUaeiou"])
-
-x,y = pad_and_one_hot([test_input, test_output])
-y_hat = model.infer(x)
-print("input: " + "".join([Sx[c] for c in x[0].max(dim=1)[1] if c != x_eos]))
-print("truth: " + "".join([Sy[c] for c in y[0].max(dim=1)[1] if c != y_eos]))
-print("guess: " + "".join([Sy[c] for c in y_hat[0].max(dim=1)[1] if c != y_eos]))
