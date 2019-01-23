@@ -1,5 +1,4 @@
 import torch
-from collections import Counter
 from models import EncoderDecoder
 from data import TextDataset, PadAndOneHot
 
