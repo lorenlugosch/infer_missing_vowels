@@ -3,10 +3,12 @@ from models import EncoderDecoder
 from data import get_datasets, PadAndOneHot
 from training import Trainer
 
+# Generate datasets from text file
+# (To use a difference text file, just change the path. The text file must contain strings separated by newlines.)
 path = "war_and_peace.txt"
 train_dataset, valid_dataset, test_dataset = get_datasets(path)
 
-# initialize model
+# Initialize model
 model = EncoderDecoder(	num_encoder_layers=2,
 						num_encoder_hidden=128, 
 						num_decoder_layers=1, 
@@ -17,9 +19,9 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						dropout=0.5)
 if torch.cuda.is_available(): model = model.cuda()
 
-trainer = Trainer(model, lr=0.001)
-
+# Train the model
 num_epochs = 20
+trainer = Trainer(model, lr=0.001)
 for epoch in range(num_epochs):
 	print("========= Epoch %d of %d =========" % (epoch, num_epochs))
 	train_acc, train_loss = trainer.train(train_dataset)
@@ -31,8 +33,11 @@ for epoch in range(num_epochs):
 	torch.save(model, "model.pth")
 
 #############################
+###### To test the model on a new phrase, uncomment this section.
+#############################
+
 # test_output = "Hello, world!\n"
-# test_input = 'Hll, wrld!\n' #"".join([c for c in test_output if c not in "AEIOUaeiou"])
+# test_input = "".join([c for c in test_output if c not in "AEIOUaeiou"]) # 'Hll, wrld!\n'
 # x,y = pad_and_one_hot([(test_input, test_output)])
 # if torch.cuda.is_available(): x = x.cuda()
 # y_hat = model.infer(x, Sy)
@@ -40,4 +45,5 @@ for epoch in range(num_epochs):
 # print("truth: " + "".join([Sy[c] for c in y[0].max(dim=1)[1] if c != y_eos]))
 # print("guess: " + "".join([Sy[c] for c in y_hat[0].max(dim=1)[1] if c != y_eos]))
 # print("")
-# #############################
+
+#############################

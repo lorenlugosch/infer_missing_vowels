@@ -24,10 +24,10 @@ def get_datasets(path):
 
 class TextDataset(torch.utils.data.Dataset):
 	def __init__(self, lines, Sx, Sy):
-		self.lines = lines
+		self.lines = lines # list of strings
 		self.Sx = Sx
 		self.Sy = Sy
-		EOS_token = '\n' # all sequences end with newline
+		EOS_token = '\n' # all strings end with newline
 		self.x_eos = self.Sx.index(EOS_token)
 		self.y_eos = self.Sy.index(EOS_token)
 		pad_and_one_hot = PadAndOneHot(self.Sx, self.Sy, self.x_eos, self.y_eos) # function for generating a minibatch from strings
