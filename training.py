@@ -45,7 +45,7 @@ class Trainer:
 			num_samples += batch_size
 			log_probs = self.model(x,y); U = y.shape[1]
 			loss = -log_probs.mean() / U
-			y_hat = self.model.infer(x, Sy)
+			y_hat = self.model.infer(x, dataset.Sy)
 			test_loss += loss.cpu().data.numpy().item() * batch_size
 			# test_acc += edit_distance(y,y_hat) * batch_size
 		test_loss /= num_samples
