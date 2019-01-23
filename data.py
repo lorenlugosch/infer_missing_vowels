@@ -16,9 +16,9 @@ def get_datasets(path):
 	total_lines = len(lines)
 	one_tenth = total_lines // 10
 
-	train_dataset = TextDataset(data[0:one_tenth * 8], Sx, Sy)
-	valid_dataset = TextDataset(data[one_tenth * 8: one_tenth * 9], Sx, Sy)
-	test_dataset = TextDataset(data[one_tenth * 9:], Sx, Sy)
+	train_dataset = TextDataset(lines[0:one_tenth * 8], Sx, Sy)
+	valid_dataset = TextDataset(lines[one_tenth * 8: one_tenth * 9], Sx, Sy)
+	test_dataset = TextDataset(lines[one_tenth * 9:], Sx, Sy)
 
 	return train_dataset, valid_dataset, test_dataset
 
