@@ -13,11 +13,12 @@ total_lines = len(data)
 one_tenth = total_lines // 10
 
 train_dataset = TextDataset(data[0:one_tenth * 8])
-train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, num_workers=1, shuffle=True, collate_fn=pad_and_one_hot)
-# train_data_loader = train_dataset.loader
+# train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, num_workers=1, shuffle=True, collate_fn=pad_and_one_hot)
+train_data_loader = train_dataset.loader
 
 valid_dataset = TextDataset(data[one_tenth * 8: one_tenth * 9])
-valid_data_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=32, num_workers=1, shuffle=True, collate_fn=pad_and_one_hot)
+# valid_data_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=32, num_workers=1, shuffle=True, collate_fn=pad_and_one_hot)
+valid_data_loader = valid_dataset.loader
 
 test_dataset = TextDataset(data[one_tenth * 9:])
 
