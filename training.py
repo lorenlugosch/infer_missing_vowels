@@ -33,9 +33,9 @@ class Trainer:
 				# print("truth: " + "".join([dataset.Sy[c] for c in y[0].max(dim=1)[1] if c != dataset.y_eos]))
 				# print("guess: " + "".join([dataset.Sy[c] for c in y_hat[0].max(dim=1)[1] if c != dataset.y_eos]))
 				# print("")
-				print("input: " + one_hot_to_string(x[0], Sx))
-				print("truth: " + one_hot_to_string(y[0], Sy))
-				print("guess: " + one_hot_to_string(y_hat[0], Sy))
+				print("input: " + one_hot_to_string(x[0], dataset.Sx))
+				print("truth: " + one_hot_to_string(y[0], dataset.Sy))
+				print("guess: " + one_hot_to_string(y_hat[0], dataset.Sy))
 				print("")
 		train_loss /= num_samples
 		train_acc /= num_samples
