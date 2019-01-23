@@ -13,7 +13,6 @@ class Trainer:
 		train_loss = 0
 		num_samples = 0
 		self.model.train()
-		# for idx, batch in enumerate(dataset.loader):
 		for idx, batch in enumerate(tqdm(dataset.loader)):
 			x,y = batch
 			batch_size = len(x)
@@ -26,13 +25,7 @@ class Trainer:
 			self.model.eval(); y_hat = self.model.infer(x, dataset.Sy); self.model.train()
 			train_loss += loss.cpu().data.numpy().item() * batch_size
 			# train_acc += edit_distance(y,y_hat) * batch_size
-
-			# print out the model's guess, to see how well it's learning
 			if idx % print_interval == 0:
-				# print("input: " + "".join([dataset.Sx[c] for c in x[0].max(dim=1)[1] if c != dataset.x_eos]))
-				# print("truth: " + "".join([dataset.Sy[c] for c in y[0].max(dim=1)[1] if c != dataset.y_eos]))
-				# print("guess: " + "".join([dataset.Sy[c] for c in y_hat[0].max(dim=1)[1] if c != dataset.y_eos]))
-				# print("")
 				print("input: " + one_hot_to_string(x[0], dataset.Sx))
 				print("truth: " + one_hot_to_string(y[0], dataset.Sy))
 				print("guess: " + one_hot_to_string(y_hat[0], dataset.Sy))

@@ -2,6 +2,7 @@ import torch
 from models import EncoderDecoder
 from data import get_datasets, PadAndOneHot
 from training import Trainer
+from helper_functions import one_hot_to_string
 
 # Generate datasets from text file
 # (To use a difference text file, just change the path. The text file must contain strings separated by newlines.)
@@ -12,7 +13,7 @@ train_dataset, valid_dataset, test_dataset = get_datasets(path)
 model = EncoderDecoder(	num_encoder_layers=2,
 						num_encoder_hidden=128, 
 						num_decoder_layers=1, 
-						num_decoder_hidden=128,
+						num_decoder_hidden=512,
 						Sx_size=len(train_dataset.Sx),	# input alphabet
 						Sy_size=len(train_dataset.Sy),	# output alphabet
 						y_eos=train_dataset.y_eos,		# index of end-of-sequence symbol for output
@@ -32,18 +33,11 @@ for epoch in range(num_epochs):
 
 	torch.save(model, "model.pth")
 
-#############################
-###### To test the model on a new phrase, uncomment this section.
-#############################
-
+# # Example of testing the model on a new phrase
 # test_output = "Hello, world!\n"
 # test_input = "".join([c for c in test_output if c not in "AEIOUaeiou"]) # 'Hll, wrld!\n'
 # x,y = pad_and_one_hot([(test_input, test_output)])
-# if torch.cuda.is_available(): x = x.cuda()
 # y_hat = model.infer(x, Sy)
-# print("input: " + "".join([Sx[c] for c in x[0].max(dim=1)[1] if c != x_eos]))
-# print("truth: " + "".join([Sy[c] for c in y[0].max(dim=1)[1] if c != y_eos]))
-# print("guess: " + "".join([Sy[c] for c in y_hat[0].max(dim=1)[1] if c != y_eos]))
-# print("")
-
-#############################
+# print("input: " + one_hot_to_string(x[0], dataset.Sx))
+# print("truth: " + one_hot_to_string(y[0], dataset.Sy))
+# print("guess: " + one_hot_to_string(y_hat[0], dataset.Sy))
