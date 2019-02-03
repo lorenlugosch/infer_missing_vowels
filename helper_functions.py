@@ -7,7 +7,7 @@ def one_hot(letters, S):
 
 	Convert batch of integer letter indices to one-hot vectors of dimension S (# of possible letters).
 	"""
-	
+
 	out = torch.zeros(letters.shape[0], letters.shape[1], S)
 	for i in range(0, letters.shape[0]):
 		for t in range(0, letters.shape[1]):

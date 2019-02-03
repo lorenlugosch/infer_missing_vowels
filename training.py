@@ -51,3 +51,4 @@ class Trainer:
 		test_loss /= num_samples
 		test_acc /= num_samples
 		return test_acc, test_loss
+		
