@@ -82,7 +82,7 @@ class DecoderRNN(torch.nn.Module):
 					state.append(layer_out)
 				else: 
 					layer_out = layer(layer_out)
-		state = torch.cat(state, dim=1)
+		state = torch.stack(state, dim=1)
 		return state 
 
 class EncoderDecoder(torch.nn.Module):
