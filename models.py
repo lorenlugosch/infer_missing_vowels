@@ -2,6 +2,29 @@ import torch
 from helper_functions import one_hot
 import sys
 
+class Attention(torch.nn.Module):
+	def __init__(self, key_dim, value_dim):
+		super(Attention, self).__init__()
+		self.scale_factor = torch.sqrt(torch.tensor(key_dim).float())
+		self.key_linear = torch.nn.Linear(input_dim, key_dim)
+		self.value_linear = torch.nn.Linear(input_dim, value_dim)
+		self.softmax = torch.nn.Softmax(dim=1)
+
+	def forward(self, input, query):
+		"""
+		input: Tensor of shape (batch size, T, input_dim)
+		query: Tensor of shape (batch size, key_dim)
+		
+		Map the input sequences to vectors (batch size, value_dim) using attention, given a query.
+		"""
+		keys = self.key_linear(input)
+		values = self.value_linear(input)
+		query = query.unsqueeze(2)
+		scores = torch.matmul(keys, query) / self.scale_factor
+		normalized_scores = self.softmax(scores).transpose(1,2)
+		out = torch.matmul(normalized_scores, values).squeeze(1)
+		return out
+
 class EncoderRNN(torch.nn.Module):
 	def __init__(self, num_encoder_layers, num_encoder_hidden, input_size, dropout):
 		super(EncoderRNN, self).__init__()
@@ -20,36 +43,47 @@ class EncoderRNN(torch.nn.Module):
 class DecoderRNN(torch.nn.Module):
 	def __init__(self, num_decoder_layers, num_decoder_hidden, input_size, dropout):
 		super(DecoderRNN, self).__init__()
-		self.gru = torch.nn.GRUCell(input_size=input_size, hidden_size=num_decoder_hidden)
-		self.dropout = torch.nn.Dropout(dropout)
-		# self.layers = []
-		# for index in range(num_decoder_layers):
-		# 	if index == 0: 
-		# 		layer = torch.nn.GRUCell(input_size=input_size, hidden_size=num_decoder_hidden) 
-		# 	else:
-		# 		layer = torch.nn.GRUCell(input_size=num_decoder_hidden, hidden_size=num_decoder_hidden) 
-		# 	self.layers.append(layer)
+		# self.gru = torch.nn.GRUCell(input_size=input_size, hidden_size=num_decoder_hidden)
+		# self.dropout = torch.nn.Dropout(dropout)
+
+		self.layers = []
+		self.num_layers = num_decoder_layers
+		for index in range(num_decoder_layers):
+			if index == 0: 
+				layer = torch.nn.GRUCell(input_size=input_size, hidden_size=num_decoder_hidden) 
+			else:
+				layer = torch.nn.GRUCell(input_size=num_decoder_hidden, hidden_size=num_decoder_hidden) 
+			layer.name = "gru%d"%index
+			self.layers.append(layer)
+
+			layer = torch.nn.Dropout(p=dropout)
+			layer.name = "dropout%d"%index
+			self.layers.append(layer)
+		self.layers = torch.nn.ModuleList(self.layers)
 
 	def forward(self, input, previous_state):
 		"""
 		input: Tensor of shape (batch size, input_size)
-		previous_state: Tensor of shape (batch size, num_decoder_hidden*num_decoder_layers)
+		previous_state: Tensor of shape (batch size, num_decoder_layers, num_decoder_hidden)
 		
 		Given the input vector, update the hidden state of each decoder layer.
 		"""
-		return self.gru(input, previous_state)
-		# state = []
-		# batch_size = input.shape[0]
-		# previous_state = previous_state.view(len(layers), batch_size, -1)
-		# for index, layer in enumerate(self.layers):
-		# 	if index = 0:
-		# 		layer_out = layer(input, previous_state[index])
-		# 		state.append(layer_out)
-		# 	else:
-		# 		layer_out = layer(layer_out, previous_state[index])
-		# 		state.append(layer_out)
-		# state = torch.stack(state).view(batch_size, -1)
-		# return 
+		# return self.gru(input, previous_state)
+
+		state = []
+		batch_size = input.shape[0]
+		for index, layer in enumerate(self.layers):
+			if index = 0:
+				layer_out = layer(input, previous_state[:, index])
+				state.append(layer_out)
+			else:
+				if "gru" in layer.name: 
+					layer_out = layer(layer_out, previous_state[:, index])
+					state.append(layer_out)
+				else: 
+					layer_out = layer(layer_out)
+		state = torch.cat(state, dim=1)
+		return state 
 
 class EncoderDecoder(torch.nn.Module):
 	"""
@@ -65,6 +99,7 @@ class EncoderDecoder(torch.nn.Module):
 		self.decoder_linear = torch.nn.Linear(num_decoder_hidden, Sy_size)
 		self.decoder_log_softmax = torch.nn.LogSoftmax(dim=1)
 		self.y_eos = y_eos # index of the end-of-sequence token
+		# self.attention = Attention(key_dim=100, value_dim=200)
 
 	def forward(self, x, y):
 		"""
@@ -86,17 +121,23 @@ class EncoderDecoder(torch.nn.Module):
 
 		# Initialize the decoder state using the encoder state
 		decoder_state = self.encoder_linear(encoder_state)
+		decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
 
 		# Initialize log p(y|x), y_u-1 to zeros
 		log_p_y_x = 0
 		y_u_1 = torch.zeros(batch_size, Sy_size)
 		if torch.cuda.is_available(): y_u_1 = y_u_1.cuda()
 		for u in range(0, U):
+			# Feed in the previous element of y and the attention output; update the decoder state
+			# context = self.attention(encoder_outputs)
+			# decoder_input = torch.cat([y_u_1, context])
+			# decoder_state = self.decoder_rnn(decoder_input, decoder_state)
+
 			# Feed in the previous element of y; update the decoder state
 			decoder_state = self.decoder_rnn(y_u_1, decoder_state)
 
 			# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
-			decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state))
+			decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state[:,-1]))
 			log_p_yu = (decoder_out * y[:,u,:]).sum(dim=1) # y_u is one-hot; use dot-product to select the y_u'th output probability 
 
 			# Add log p(y_u|...) to log p(y|x)
