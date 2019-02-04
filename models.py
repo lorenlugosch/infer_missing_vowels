@@ -137,7 +137,6 @@ class EncoderDecoder(torch.nn.Module):
 			decoder_state = self.decoder_rnn(y_u_1, decoder_state)
 
 			# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
-			print(decoder_state.shape); print(decoder_state[:,-1].shape)
 			decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state[:,-1]))
 			log_p_yu = (decoder_out * y[:,u,:]).sum(dim=1) # y_u is one-hot; use dot-product to select the y_u'th output probability 
 
@@ -181,6 +180,7 @@ class EncoderDecoder(torch.nn.Module):
 
 		# Initialize the decoder state using the encoder state
 		decoder_state = self.encoder_linear(encoder_state)
+		decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
 
 		# Initialize list to empty
 		y_hat = []
@@ -189,20 +189,20 @@ class EncoderDecoder(torch.nn.Module):
 		if torch.cuda.is_available(): y_hat_u_1 = y_hat_u_1.cuda()
 		for u in range(U_max):
 			for b in range(B):
-				y_hat_u_1 = beam[b]
+				# y_hat_u_1 = beam[b]
 
 				# Feed in the previous guess; update the decoder state
 				# decoder_state = self.decoder_rnn(y_hat[:,u-1,:], decoder_state)
 				decoder_state = self.decoder_rnn(y_hat_u_1, decoder_state)
 
 				# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
-				decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state))
+				decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state[:,-1]))
 
 				# Find the top B outputs
-				top_B = decoder_out.topk(B)[1]
-				# y_hat_u_1 -= y_hat_u_1 # set to zero
-				# y_hat_u_1[torch.arange(batch_size), decoder_out.max(dim=1)[1]] = 1.
-				# y_hat.append(y_hat_u_1.clone())
+				# top_B = decoder_out.topk(B)[1]
+				y_hat_u_1 -= y_hat_u_1 # set to zero
+				y_hat_u_1[torch.arange(batch_size), decoder_out.max(dim=1)[1]] = 1.
+				y_hat.append(y_hat_u_1.clone())
 
 		y_hat = torch.cat([y_.unsqueeze(1) for y_ in y_hat], dim=1)
 		return y_hat
