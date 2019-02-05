@@ -11,9 +11,9 @@ train_dataset, valid_dataset, test_dataset = get_datasets(path)
 
 # Initialize model
 model = EncoderDecoder(	num_encoder_layers=2,
-						num_encoder_hidden=128, 
+						num_encoder_hidden=256, 
 						num_decoder_layers=2, 
-						num_decoder_hidden=256,
+						num_decoder_hidden=512,
 						Sx_size=len(train_dataset.Sx),	# input alphabet
 						Sy_size=len(train_dataset.Sy),	# output alphabet
 						y_eos=train_dataset.y_eos,		# index of end-of-sequence symbol for output

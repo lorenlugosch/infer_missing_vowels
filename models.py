@@ -28,7 +28,7 @@ class Attention(torch.nn.Module):
 class EncoderRNN(torch.nn.Module):
 	def __init__(self, num_encoder_layers, num_encoder_hidden, input_size, dropout):
 		super(EncoderRNN, self).__init__()
-		self.gru = torch.nn.GRU(input_size=input_size, hidden_size=num_encoder_hidden, num_layers=num_encoder_layers, batch_first=True, bidirectional=True) #dropout=dropout, bidirectional=True)
+		self.gru = torch.nn.GRU(input_size=input_size, hidden_size=num_encoder_hidden, num_layers=num_encoder_layers, batch_first=True, dropout=dropout, bidirectional=True)
 
 	def forward(self, input):
 		"""
