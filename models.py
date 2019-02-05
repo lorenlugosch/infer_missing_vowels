@@ -160,18 +160,7 @@ class EncoderDecoder(torch.nn.Module):
 		(If B = 1, this is equivalent to greedy search.) 
 		TODO implement B > 1
 		"""
-		# y_hat = [] # List of guessed outputs for each input in the batch.
-
-		# U_max = 100 # maximum length
-		# for x_ in x:
-		# 	done = False
-		# 	beam = []
-		# 	while u < U_max:
-		# 		break
-
-		# 	y_hat.append(beam[0])
-
-		# return y_hat
+		greedy = True
 
 		if torch.cuda.is_available(): x = x.cuda()
 
@@ -188,24 +177,45 @@ class EncoderDecoder(torch.nn.Module):
 		# Initialize list to empty
 		y_hat = []
 		U_max = 100
-		y_hat_u_1 = torch.zeros(batch_size, Sy_size)
-		if torch.cuda.is_available(): y_hat_u_1 = y_hat_u_1.cuda()
-		for u in range(U_max):
-			# for b in range(B):
-				# y_hat_u_1 = beam[b]
 
-			# Feed in the previous guess; update the decoder state
-			# decoder_state = self.decoder_rnn(y_hat[:,u-1,:], decoder_state)
-			decoder_state = self.decoder_rnn(y_hat_u_1, decoder_state)
+		if greedy:
+			for u in range(U_max):
+				# Get previous guess
+				if u == 0: y_hat_u_1 = torch.zeros(batch_size, Sy_size)
+				else: y_hat_u_1 = y_hat[-1]
+				if torch.cuda.is_available(): y_hat_u_1 = y_hat_u_1.cuda()
 
-			# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
-			decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state[:,-1]))
+				# Feed in the previous guess; update the decoder state
+				decoder_state = self.decoder_rnn(y_hat_u_1, decoder_state)
 
-			# Find the top B outputs
-			# top_B = decoder_out.topk(B)[1]
-			y_hat_u_1 -= y_hat_u_1 # set to zero
-			y_hat_u_1[torch.arange(batch_size), decoder_out.max(dim=1)[1]] = 1.
-			y_hat.append(y_hat_u_1.clone())
+				# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
+				decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state[:,-1]))
+
+				# Find the top output
+				extension = torch.zeros(batch_size, Sy_size)
+				extension[torch.arange(batch_size), decoder_out.max(dim=1)[1]] = 1.
+				y_hat.append(extension.clone())
+
+		# else: 
+		# 	beam = []; beam_extensions = []; decoder_states = []; decoder_state_extensions = []; log_prob
+		# 	for u in range(U_max):
+		# 		for b in range(B):
+		# 			y_hat_u_1 = beam[b]
+		# 			decoder_state = decoder_states[b]
+
+		# 			# Feed in the previous guess; update the decoder state
+		# 			# decoder_state = self.decoder_rnn(y_hat[:,u-1,:], decoder_state)
+		# 			decoder_state = self.decoder_rnn(y_hat_u_1, decoder_state)
+
+		# 			# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
+		# 			decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state[:,-1]))
+
+		# 			# Find the top B outputs
+		# 			beam_extensions.append() = decoder_out.topk(B)[1]
+		# 			y_hat_u_1 -= y_hat_u_1 # set to zero
+		# 			y_hat_u_1[torch.arange(batch_size), decoder_out.max(dim=1)[1]] = 1.
+		# 			y_hat.append(y_hat_u_1.clone())
+		# 		beam = 
 
 		y_hat = torch.cat([y_.unsqueeze(1) for y_ in y_hat], dim=1)
 		return y_hat
