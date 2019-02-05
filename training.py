@@ -6,7 +6,7 @@ class Trainer:
 	def __init__(self, model, lr):
 		self.model = model
 		self.lr = lr
-		self.optimizer = torch.optim.Adam(model.parameters(), lr=self.lr)
+		self.optimizer = torch.optim.Adam(model.parameters(), lr=self.lr, weight_decay=0.0001)
 		
 	def train(self, dataset):
 		train_acc = 0

@@ -72,14 +72,17 @@ class DecoderRNN(torch.nn.Module):
 
 		state = []
 		batch_size = input.shape[0]
+		gru_index = 0
 		for index, layer in enumerate(self.layers):
 			if index == 0:
-				layer_out = layer(input, previous_state[:, index])
+				layer_out = layer(input, previous_state[:, gru_index])
 				state.append(layer_out)
+				gru_index += 1
 			else:
-				if "gru" in layer.name: 
-					layer_out = layer(layer_out, previous_state[:, index])
+				if "gru" in layer.name:
+					layer_out = layer(layer_out, previous_state[:, gru_index])
 					state.append(layer_out)
+					gru_index += 1
 				else: 
 					layer_out = layer(layer_out)
 		state = torch.stack(state, dim=1)
