@@ -12,7 +12,7 @@ train_dataset, valid_dataset, test_dataset = get_datasets(path)
 # Initialize model
 model = EncoderDecoder(	num_encoder_layers=2,
 						num_encoder_hidden=128, 
-						num_decoder_layers=1, 
+						num_decoder_layers=2, 
 						num_decoder_hidden=512,
 						Sx_size=len(train_dataset.Sx),	# input alphabet
 						Sy_size=len(train_dataset.Sy),	# output alphabet
@@ -28,7 +28,7 @@ for epoch in range(num_epochs):
 	train_acc, train_loss = trainer.train(train_dataset)
 	valid_acc, valid_loss = trainer.test(valid_dataset)
 
-	print("========= Results: epoch %d of %d =========" % (epoch, num_epochs))
+	print("========= Results: epoch %d of %d =========" % (epoch+1, num_epochs))
 	print("train accuracy: %.2f| train loss: %.2f| valid accuracy: %.2f| valid loss: %.2f\n" % (train_acc, train_loss, valid_acc, valid_loss) )
 
 	torch.save(model, "model.pth")
