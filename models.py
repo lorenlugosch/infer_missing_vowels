@@ -254,7 +254,7 @@ class EncoderDecoder(torch.nn.Module):
 			for b in range(len(beam_extensions[:B])):
 				for batch_index in range(batch_size):
 					beam[b,batch_index] = old_beam[beam_pointers[b, batch_index],batch_index] #.clone()?
-					beam[b,batch_index,u,:] = beam_extensions[b]
+					beam[b,batch_index,u,:] = beam_extensions[b, batch_index]
 					beam_scores[b, batch_index] = beam_extension_scores[b, batch_index]
 					decoder_states[b, batch_index] = old_decoder_states[beam_pointers[b, batch_index],batch_index] #.clone()?
 			# beam[torch.arange(batch_size)] = old_beam[beam_pointers[torch.arange(batch_size)]].copy()
