@@ -223,9 +223,10 @@ class EncoderDecoder(torch.nn.Module):
 			for b in range(B):
 				# Get previous guess
 				if u == 0: 
-					beam_score = 0.
+					beam_score = torch.zeros(1)
 					y_hat_u_1 = torch.zeros(batch_size, Sy_size)
 					if torch.cuda.is_available():
+						beam_score = beam_score.cuda()
 						y_hat_u_1 = y_hat_u_1.cuda()
 				else: 
 					# Select hypothesis (and corresponding decoder state/score) from beam
