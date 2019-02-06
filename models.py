@@ -213,6 +213,11 @@ class EncoderDecoder(torch.nn.Module):
 		# beam = []; beam_scores = []; decoder_states = []
 		decoder_state_shape = decoder_state.shape # (batch_size, )
 		beam = torch.zeros(B,batch_size,U_max,Sy_size); beam_scores = torch.zeros(B,batch_size); decoder_states = torch.zeros(B,decoder_state_shape[0], decoder_state_shape[1], decoder_state_shape[2])
+		if torch.cuda.is_available():
+			beam = beam.cuda()
+			beam_scores = beam_scores.cuda()
+			decoder_states = decoder_states.cuda()
+
 		for u in range(U_max):
 			beam_extensions = []; beam_extension_scores = []; beam_pointers = []
 			for b in range(B):
@@ -220,6 +225,8 @@ class EncoderDecoder(torch.nn.Module):
 				if u == 0: 
 					beam_score = 0.
 					y_hat_u_1 = torch.zeros(batch_size, Sy_size)
+					if torch.cuda.is_available():
+						y_hat_u_1 = y_hat_u_1.cuda()
 				else: 
 					# Select hypothesis (and corresponding decoder state/score) from beam
 					y_hat = beam[b]
@@ -227,10 +234,10 @@ class EncoderDecoder(torch.nn.Module):
 					beam_score = beam_scores[b]
 					y_hat_u_1 = y_hat[:,u-1,:]
 
-				if torch.cuda.is_available():
-					y_hat_u_1 = y_hat_u_1.cuda()
-					decoder_state = decoder_state.cuda()
-					beam_score = torch.tensor(beam_score).cuda()
+				# if torch.cuda.is_available():
+				# 	y_hat_u_1 = y_hat_u_1.cuda()
+					# decoder_state = decoder_state.cuda()
+					# beam_score = torch.tensor(beam_score).cuda()
 
 				# Feed in the previous guess; update the decoder state
 				decoder_state = self.decoder_rnn(y_hat_u_1, decoder_state)
@@ -255,6 +262,11 @@ class EncoderDecoder(torch.nn.Module):
 			beam_extensions, beam_extension_scores, beam_pointers = sort_beam(beam_extensions, beam_extension_scores, beam_pointers)
 			old_beam = beam.clone(); old_beam_scores = beam_scores.clone(); old_decoder_states = decoder_states.clone()
 			beam = torch.zeros(B,batch_size,U_max,Sy_size); beam_scores = torch.zeros(B,batch_size,1); decoder_states = torch.zeros(B,decoder_state_shape[0], decoder_state_shape[1], decoder_state_shape[2])
+			if torch.cuda.is_available():
+				beam = beam.cuda()
+				beam_scores = beam_scores.cuda()
+				decoder_states = decoder_states.cuda()
+
 			for b in range(len(beam_extensions[:B])):
 				for batch_index in range(batch_size):
 					beam[b,batch_index] = old_beam[beam_pointers[b, batch_index],batch_index] #.clone()?
