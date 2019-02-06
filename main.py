@@ -26,7 +26,7 @@ num_epochs = 50
 trainer = Trainer(model, lr=0.001)
 for epoch in range(num_epochs):
 	print("========= Epoch %d of %d =========" % (epoch+1, num_epochs))
-	# train_acc, train_loss = trainer.train(train_dataset)
+	train_acc, train_loss = trainer.train(train_dataset)
 	valid_acc, valid_loss = trainer.test(valid_dataset)
 
 	print("========= Results: epoch %d of %d =========" % (epoch+1, num_epochs))
