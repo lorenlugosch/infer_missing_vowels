@@ -223,7 +223,7 @@ class EncoderDecoder(torch.nn.Module):
 			for b in range(B):
 				# Get previous guess
 				if u == 0: 
-					beam_score = torch.zeros(1)
+					beam_score = torch.zeros(1, batch_size)
 					y_hat_u_1 = torch.zeros(batch_size, Sy_size)
 					if torch.cuda.is_available():
 						beam_score = beam_score.cuda()
@@ -248,11 +248,12 @@ class EncoderDecoder(torch.nn.Module):
 
 				# Find the top B possible extensions
 				top_B_extension_scores, top_B_extensions = decoder_out.topk(B)
+				top_B_extension_scores = top_B_extension_scores.transpose(0,1); top_B_extensions = top_B_extensions.transpose(0,1)
 				for extension_index in range(B):
 					extension = torch.zeros(batch_size, Sy_size)
 					print(top_B_extension_scores.shape); print(beam_score.shape); print("")
-					extension_score = top_B_extension_scores[:,extension_index] + beam_score
-					extension[torch.arange(batch_size), top_B_extensions[:,extension_index]] = 1.
+					extension_score = top_B_extension_scores[extension_index] + beam_score
+					extension[torch.arange(batch_size), top_B_extensions[extension_index]] = 1.
 					beam_extensions.append(extension.clone())
 					beam_extension_scores.append(extension_score.clone())
 					beam_pointers.append(torch.ones(batch_size).long() * b) # we need to remember which hypothesis this extension belongs to
