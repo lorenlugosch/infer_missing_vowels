@@ -217,6 +217,7 @@ class EncoderDecoder(torch.nn.Module):
 			for b in range(B):
 				# Get previous guess
 				if u == 0: 
+					beam_score = 0.
 					y_hat_u_1 = torch.zeros(batch_size, Sy_size)
 				else: 
 					# Select hypothesis (and corresponding decoder state/score) from beam
