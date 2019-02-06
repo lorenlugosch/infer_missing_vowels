@@ -47,7 +47,7 @@ class Trainer:
 				print("truth: " + one_hot_to_string(y[0], dataset.Sy))
 				y_hat = self.model.infer(x, dataset.Sy, B=1)
 				print("greedy guess: " + one_hot_to_string(y_hat[0], dataset.Sy))
-				y_hat = self.model.infer(x, dataset.Sy, B=2)
+				y_hat = self.model.infer(x, dataset.Sy, B=4)
 				print("beam guess: " + one_hot_to_string(y_hat[0], dataset.Sy))
 				print("")
 
@@ -55,7 +55,7 @@ class Trainer:
 				print("truth: " + one_hot_to_string(y[1], dataset.Sy))
 				y_hat = self.model.infer(x, dataset.Sy, B=1)
 				print("greedy guess: " + one_hot_to_string(y_hat[1], dataset.Sy))
-				y_hat = self.model.infer(x, dataset.Sy, B=2)
+				y_hat = self.model.infer(x, dataset.Sy, B=4)
 				print("beam guess: " + one_hot_to_string(y_hat[1], dataset.Sy))
 				print("")
 		test_loss /= num_samples
