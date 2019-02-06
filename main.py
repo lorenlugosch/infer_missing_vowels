@@ -18,7 +18,6 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						Sy_size=len(train_dataset.Sy),	# output alphabet
 						y_eos=train_dataset.y_eos,		# index of end-of-sequence symbol for output
 						dropout=0.5)
-model = torch.load("model.pth"); print("LOADING OLD MODEL")
 if torch.cuda.is_available(): model = model.cuda()
 
 # Train the model
