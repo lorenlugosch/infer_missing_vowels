@@ -236,6 +236,7 @@ class EncoderDecoder(torch.nn.Module):
 
 				# Find the top B possible extensions
 				top_B_extension_scores, top_B_extensions = decoder_out.topk(B)
+				print(top_B_extensions.shape)
 				for extension_index in range(B):
 					extension = torch.zeros(batch_size, Sy_size)
 					extension_score = top_B_extension_scores[extension_index] + beam_score
