@@ -91,8 +91,7 @@ class DecoderRNN(torch.nn.Module):
 def sort_beam(beam_extensions, beam_extension_scores, beam_pointers):
 	beam_width = len(beam_pointers); batch_size = beam_pointers[0].shape[0]
 	beam_extensions = torch.stack(beam_extensions); beam_extension_scores = torch.stack(beam_extension_scores).squeeze(1); beam_pointers = torch.stack(beam_pointers)
-	print(beam_extensions.shape); print(beam_extension_scores.shape); print(beam_pointers.shape); print("")
-
+	
 	sort_order = beam_extension_scores.sort(dim=0)[1].reshape(beam_width, batch_size)
 	sorted_beam_extensions = beam_extensions.clone(); sorted_beam_extension_scores = beam_extension_scores.clone(); sorted_beam_pointers = beam_pointers.clone()
 	
@@ -251,7 +250,6 @@ class EncoderDecoder(torch.nn.Module):
 				top_B_extension_scores = top_B_extension_scores.transpose(0,1); top_B_extensions = top_B_extensions.transpose(0,1)
 				for extension_index in range(B):
 					extension = torch.zeros(batch_size, Sy_size)
-					print(top_B_extension_scores.shape); print(beam_score.shape); print("")
 					extension_score = top_B_extension_scores[extension_index] + beam_score
 					extension[torch.arange(batch_size), top_B_extensions[extension_index]] = 1.
 					beam_extensions.append(extension.clone())
