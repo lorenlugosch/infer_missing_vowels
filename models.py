@@ -237,6 +237,7 @@ class EncoderDecoder(torch.nn.Module):
 
 				# Feed in the previous guess; update the decoder state
 				decoder_state = self.decoder_rnn(y_hat_u_1, decoder_state)
+				decoder_states[b] = decoder_state.clone()
 
 				# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
 				decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state[:,-1]))
