@@ -222,10 +222,9 @@ class EncoderDecoder(torch.nn.Module):
 				else: 
 					# Select hypothesis (and corresponding decoder state/score) from beam
 					y_hat = beam[b]
-					print(beam.shape); print(beam[b].shape)
 					decoder_state = decoder_states[b]
 					beam_score = beam_scores[b]
-					y_hat_u_1 = y_hat[-1]
+					y_hat_u_1 = y_hat[:,u-1,:]
 
 				if torch.cuda.is_available(): y_hat_u_1 = y_hat_u_1.cuda()
 
@@ -264,6 +263,7 @@ class EncoderDecoder(torch.nn.Module):
 			# beam_scores[torch.arange(batch_size)] = beam_extension_scores[torch.arange(batch_size)]
 			# decoder_states[torch.arange(batch_size)] = old_decoder_states[beam_pointers[torch.arange(batch_size)]].copy()
 
-		y_hat = torch.cat([y_.unsqueeze(1) for y_ in beam[0]], dim=1)
+		# y_hat = torch.cat([y_.unsqueeze(1) for y_ in beam[0]], dim=1)
+		y_hat = beam[0]
 		return y_hat
 
