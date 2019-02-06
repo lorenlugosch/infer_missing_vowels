@@ -250,8 +250,8 @@ class EncoderDecoder(torch.nn.Module):
 				top_B_extension_scores, top_B_extensions = decoder_out.topk(B)
 				for extension_index in range(B):
 					extension = torch.zeros(batch_size, Sy_size)
+					print(top_B_extension_scores.shape); print(beam_score.shape); print("")
 					extension_score = top_B_extension_scores[:,extension_index] + beam_score
-					print(extension_score.shape); print("")
 					extension[torch.arange(batch_size), top_B_extensions[:,extension_index]] = 1.
 					beam_extensions.append(extension.clone())
 					beam_extension_scores.append(extension_score.clone())
