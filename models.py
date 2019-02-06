@@ -1,5 +1,5 @@
 import torch
-from helper_functions import one_hot
+from helper_functions import one_hot, one_hot_to_string
 import sys
 
 class Attention(torch.nn.Module):
@@ -230,6 +230,7 @@ class EncoderDecoder(torch.nn.Module):
 				else: 
 					# Select hypothesis (and corresponding decoder state/score) from beam
 					y_hat = beam[b]
+					print(one_hot_to_string(y_hat[0], Sy))
 					decoder_state = decoder_states[b]
 					beam_score = beam_scores[b]
 					y_hat_u_1 = y_hat[:,u-1,:]
