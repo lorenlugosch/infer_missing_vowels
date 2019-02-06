@@ -252,11 +252,11 @@ class EncoderDecoder(torch.nn.Module):
 			old_beam = beam.clone(); old_beam_scores = beam_scores.clone(); old_decoder_states = decoder_states.clone()
 			beam = torch.zeros(B,batch_size,U_max,Sy_size); beam_scores = torch.zeros(B,batch_size,1); decoder_states = torch.zeros(B,decoder_state_shape[0], decoder_state_shape[1], decoder_state_shape[2])
 			for b in range(len(beam_extensions[:B])):
-				print(beam_pointers[b].shape); print(old_beam.shape)
-				beam[b] = old_beam[beam_pointers[b]] #.clone()?
-				beam[b,:,u,:] = beam_extensions[b]
-				beam_scores[b] = beam_extension_scores[b]
-				decoder_states[b] = old_decoder_states[beam_pointers[b]] #.clone()?
+				for batch_index in range(batch_size):
+					beam[b,batch_index] = old_beam[beam_pointers[b, batch_index],batch_index] #.clone()?
+					beam[b,batch_index,u,:] = beam_extensions[b]
+					beam_scores[b, batch_index] = beam_extension_scores[b, batch_index]
+					decoder_states[b, batch_index] = old_decoder_states[beam_pointers[b, batch_index],batch_index] #.clone()?
 			# beam[torch.arange(batch_size)] = old_beam[beam_pointers[torch.arange(batch_size)]].copy()
 			# beam[torch.arange(batch_size),:,u,:] = beam_extensions[torch.arange(batch_size)]
 			# beam_scores[torch.arange(batch_size)] = beam_extension_scores[torch.arange(batch_size)]
