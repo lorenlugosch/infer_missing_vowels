@@ -232,6 +232,7 @@ class EncoderDecoder(torch.nn.Module):
 					# Select hypothesis (and corresponding decoder state/score) from beam
 					y_hat = beam[b]
 					decoder_state = decoder_states[b]
+					print(beam_scores.shape)
 					beam_score = beam_scores[b]
 					y_hat_u_1 = y_hat[:,u-1,:]
 
@@ -251,7 +252,7 @@ class EncoderDecoder(torch.nn.Module):
 				top_B_extension_scores = top_B_extension_scores.transpose(0,1); top_B_extensions = top_B_extensions.transpose(0,1)
 				for extension_index in range(B):
 					extension = torch.zeros(batch_size, Sy_size)
-					print(top_B_extension_scores.shape); print(beam_score.shape); print("")
+					# print(top_B_extension_scores.shape); print(beam_score.shape); print("")
 					extension_score = top_B_extension_scores[extension_index] + beam_score
 					extension[torch.arange(batch_size), top_B_extensions[extension_index]] = 1.
 					beam_extensions.append(extension.clone())
