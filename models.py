@@ -225,6 +225,7 @@ class EncoderDecoder(torch.nn.Module):
 					decoder_state = decoder_states[b]
 					beam_score = beam_scores[b]
 					y_hat_u_1 = y_hat[-1]
+					print(y_hat_u_1.shape)
 
 				if torch.cuda.is_available(): y_hat_u_1 = y_hat_u_1.cuda()
 
