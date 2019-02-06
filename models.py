@@ -229,6 +229,7 @@ class EncoderDecoder(torch.nn.Module):
 				if torch.cuda.is_available():
 					y_hat_u_1 = y_hat_u_1.cuda()
 					decoder_state = decoder_state.cuda()
+					beam_score = beam_score.cuda()
 
 				# Feed in the previous guess; update the decoder state
 				decoder_state = self.decoder_rnn(y_hat_u_1, decoder_state)
