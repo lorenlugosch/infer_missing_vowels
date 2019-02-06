@@ -50,6 +50,14 @@ class Trainer:
 				y_hat = self.model.infer(x, dataset.Sy, B=2)
 				print("beam guess: " + one_hot_to_string(y_hat[0], dataset.Sy))
 				print("")
+
+				print("input: " + one_hot_to_string(x[1], dataset.Sx))
+				print("truth: " + one_hot_to_string(y[1], dataset.Sy))
+				y_hat = self.model.infer(x, dataset.Sy, B=1)
+				print("greedy guess: " + one_hot_to_string(y_hat[1], dataset.Sy))
+				y_hat = self.model.infer(x, dataset.Sy, B=2)
+				print("beam guess: " + one_hot_to_string(y_hat[1], dataset.Sy))
+				print("")
 		test_loss /= num_samples
 		test_acc /= num_samples
 		return test_acc, test_loss
