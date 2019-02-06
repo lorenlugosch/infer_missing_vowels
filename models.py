@@ -91,8 +91,7 @@ class DecoderRNN(torch.nn.Module):
 def sort_beam(beam_extensions, beam_extension_scores, beam_pointers):
 	beam_width = len(beam_pointers); batch_size = beam_pointers[0].shape[0]
 	beam_extensions = torch.stack(beam_extensions); beam_extension_scores = torch.stack(beam_extension_scores); beam_pointers = torch.stack(beam_pointers)
-	print(beam_extensions.shape); print(beam_extension_scores.shape); print(beam_pointers.shape)
-
+	
 	sort_order = beam_extension_scores.sort(dim=0)[1].reshape(beam_width, batch_size)
 	sorted_beam_extensions = beam_extensions.clone(); sorted_beam_extension_scores = beam_extension_scores.clone(); sorted_beam_pointers = beam_pointers.clone()
 	
@@ -212,7 +211,7 @@ class EncoderDecoder(torch.nn.Module):
 		# else: 
 		# beam = []; beam_scores = []; decoder_states = []
 		decoder_state_shape = decoder_state.shape # (batch_size, )
-		beam = torch.zeros(B,batch_size,U_max,Sy_size); beam_scores = torch.zeros(B,batch_size,1); decoder_states = torch.zeros(B,decoder_state_shape[0], decoder_state_shape[1], decoder_state_shape[2])
+		beam = torch.zeros(B,batch_size,U_max,Sy_size); beam_scores = torch.zeros(B,batch_size); decoder_states = torch.zeros(B,decoder_state_shape[0], decoder_state_shape[1], decoder_state_shape[2])
 		for u in range(U_max):
 			beam_extensions = []; beam_extension_scores = []; beam_pointers = []
 			for b in range(B):
@@ -253,6 +252,7 @@ class EncoderDecoder(torch.nn.Module):
 			old_beam = beam.clone(); old_beam_scores = beam_scores.clone(); old_decoder_states = decoder_states.clone()
 			beam = torch.zeros(B,batch_size,U_max,Sy_size); beam_scores = torch.zeros(B,batch_size,1); decoder_states = torch.zeros(B,decoder_state_shape[0], decoder_state_shape[1], decoder_state_shape[2])
 			for b in range(len(beam_extensions[:B])):
+				print(beam_pointers[b].shape); print(old_beam.shape)
 				beam[b] = old_beam[beam_pointers[b]] #.clone()?
 				beam[b,:,u,:] = beam_extensions[b]
 				beam_scores[b] = beam_extension_scores[b]
