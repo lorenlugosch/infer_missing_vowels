@@ -230,7 +230,10 @@ class EncoderDecoder(torch.nn.Module):
 				else: 
 					# Select hypothesis (and corresponding decoder state/score) from beam
 					y_hat = beam[b]
-					print(one_hot_to_string(y_hat[0,:u], Sy).rstrip("\n"))
+					if u < 30:
+						time.sleep(1)
+						print(one_hot_to_string(y_hat[0,:u], Sy).strip("\n"))
+
 					decoder_state = decoder_states[b]
 					beam_score = beam_scores[b]
 					y_hat_u_1 = y_hat[:,u-1,:]
