@@ -222,6 +222,7 @@ class EncoderDecoder(torch.nn.Module):
 			beam_extensions = []; beam_extension_scores = []; beam_pointers = []
 			if u < 30:
 				time.sleep(1)
+				print("")
 			for b in range(B):
 				# Get previous guess
 				if u == 0: 
@@ -260,7 +261,6 @@ class EncoderDecoder(torch.nn.Module):
 
 				# At the first decoding timestep, there are no other hypotheses to extend.
 				if u == 0: break
-			print("")
 
 			# Of the (up to) B^2 extensions hypotheses, pick the top B
 			beam_extensions, beam_extension_scores, beam_pointers = sort_beam(beam_extensions, beam_extension_scores, beam_pointers)
