@@ -237,7 +237,7 @@ class EncoderDecoder(torch.nn.Module):
 					y_hat = beam[b]
 					if debug:
 						if u < 30:
-							print(one_hot_to_string(y_hat[0,:u], Sy).strip("\n"))
+							print(one_hot_to_string(y_hat[0,:u], Sy).strip("\n") + " | score:" + str(beam_score))
 
 					decoder_state = decoder_states[b]
 					beam_score = beam_scores[b]

@@ -22,7 +22,7 @@ model.load_state_dict(torch.load("model_state.pth"))
 if torch.cuda.is_available(): model = model.cuda()
 
 # Train the model
-num_epochs = 10
+num_epochs = 0
 trainer = Trainer(model, lr=0.0001)
 for epoch in range(num_epochs):
 	print("========= Epoch %d of %d =========" % (epoch+1, num_epochs))
@@ -39,11 +39,11 @@ model.eval()
 Sx = train_dataset.Sx; Sy = train_dataset.Sy; x_eos= train_dataset.x_eos; y_eos = train_dataset.y_eos
 pad_and_one_hot = PadAndOneHot(Sx, Sy, x_eos, y_eos)
 
-test_output = "You are the best around.\n"
+test_output = "Hello, world!\"\n" + "\n"*50
 test_input = "".join([c for c in test_output if c not in "AEIOUaeiou"]) # 'Hll, wrld!\n'
 x,y = pad_and_one_hot([(test_input, test_output)])
 xx = torch.stack([x,x]).squeeze(1)
-y_hat = model.infer(xx, Sy, debug=True)
+y_hat = model.infer(xx, Sy, B=8, debug=True)
 print("input: " + one_hot_to_string(xx[0], Sx))
 print("truth: " + one_hot_to_string(y[0], Sy))
 print("guess: " + one_hot_to_string(y_hat[0], Sy))
