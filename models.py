@@ -165,7 +165,7 @@ class EncoderDecoder(torch.nn.Module):
 
 		return log_p_y_x
 
-	def infer(self, x, Sy, B=2, debug=False):
+	def infer(self, x, Sy, B=2, debug=False, true_U=None):
 		"""
 		x : Tensor of shape (batch size, T, |Sx|)
 		Sy : list of characters (output alphabet)
@@ -221,7 +221,7 @@ class EncoderDecoder(torch.nn.Module):
 		for u in range(U_max):
 			beam_extensions = []; beam_extension_scores = []; beam_pointers = []
 			if debug:
-				if u < 30:
+				if u < true_U:
 					time.sleep(1)
 					print("")
 			for b in range(B):
@@ -239,7 +239,7 @@ class EncoderDecoder(torch.nn.Module):
 					beam_score = beam_scores[b]
 					y_hat_u_1 = y_hat[:,u-1,:]
 					if debug:
-						if u < 55:
+						if u < true_U:
 							print(one_hot_to_string(y_hat[0,:u], Sy).strip("\n") + " | score: %1.2f" % beam_score[0].item())
 
 				# Feed in the previous guess; update the decoder state

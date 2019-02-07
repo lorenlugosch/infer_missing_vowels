@@ -1,12 +1,20 @@
 import torch
 from tqdm import tqdm # for displaying progress bar
 from helper_functions import one_hot_to_string
+import os
 
 class Trainer:
 	def __init__(self, model, lr):
 		self.model = model
 		self.lr = lr
 		self.optimizer = torch.optim.Adam(model.parameters(), lr=self.lr, weight_decay=0.00001)
+
+	def load_checkpoint(checkpoint_path):
+		is os.path.isfile(os.path.join(checkpoint_path, "model_state.pth")):
+			self.model.load_state_dict(torch.load(os.path.join(checkpoint_path, "model_state.pth")))
+
+	def save_checkpoint(epoch, checkpoint_path):
+		torch.save(self.model.state_dict(), os.path.join(checkpoint_path, "model_state.pth"))
 		
 	def train(self, dataset):
 		train_acc = 0
