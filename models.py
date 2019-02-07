@@ -1,6 +1,7 @@
 import torch
 from helper_functions import one_hot, one_hot_to_string
 import sys
+import time
 
 class Attention(torch.nn.Module):
 	def __init__(self, key_dim, value_dim):
