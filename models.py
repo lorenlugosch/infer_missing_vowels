@@ -240,7 +240,7 @@ class EncoderDecoder(torch.nn.Module):
 					y_hat_u_1 = y_hat[:,u-1,:]
 					if debug:
 						if u < 30:
-							print(one_hot_to_string(y_hat[0,:u], Sy).strip("\n") + " | score: " + str(beam_score[0].item()))
+							print(one_hot_to_string(y_hat[0,:u], Sy).strip("\n") + " | score: %1.2f" % beam_score[0].item())
 
 				# Feed in the previous guess; update the decoder state
 				decoder_state = self.decoder_rnn(y_hat_u_1, decoder_state)
