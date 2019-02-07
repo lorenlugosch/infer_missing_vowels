@@ -41,7 +41,8 @@ pad_and_one_hot = PadAndOneHot(Sx, Sy, x_eos, y_eos)
 test_output = "You are the best around\n"
 test_input = "".join([c for c in test_output if c not in "AEIOUaeiou"]) # 'Hll, wrld!\n'
 x,y = pad_and_one_hot([(test_input, test_output)])
-y_hat = model.infer(x, Sy)
-print("input: " + one_hot_to_string(x[0], Sx))
+xx = torch.stack([x,x]).squeeze(1)
+y_hat = model.infer(xx, Sy)
+print("input: " + one_hot_to_string(xx[0], Sx))
 print("truth: " + one_hot_to_string(y[0], Sy))
 print("guess: " + one_hot_to_string(y_hat[0], Sy))
