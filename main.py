@@ -24,7 +24,6 @@ if torch.cuda.is_available(): model = model.cuda()
 # Train the model
 num_epochs = 0
 trainer = Trainer(model, lr=0.0001)
-# model.load_state_dict(torch.load("model_state.pth"))
 trainer.load_checkpoint(checkpoint_path)
 
 for epoch in range(num_epochs):
@@ -35,7 +34,6 @@ for epoch in range(num_epochs):
 	print("========= Results: epoch %d of %d =========" % (epoch+1, num_epochs))
 	print("train accuracy: %.2f| train loss: %.2f| valid accuracy: %.2f| valid loss: %.2f\n" % (train_acc, train_loss, valid_acc, valid_loss) )
 
-	# torch.save(model.state_dict(), "model_state.pth")
 	trainer.save_checkpoint(epoch, checkpoint_path)
 
 # # Example of testing the model on a new phrase

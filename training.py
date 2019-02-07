@@ -2,12 +2,14 @@ import torch
 from tqdm import tqdm # for displaying progress bar
 from helper_functions import one_hot_to_string
 import os
+import pandas as pd
 
 class Trainer:
 	def __init__(self, model, lr):
 		self.model = model
 		self.lr = lr
 		self.optimizer = torch.optim.Adam(model.parameters(), lr=self.lr, weight_decay=0.00001)
+		self.progress_df = pd.DataFrame()
 
 	def load_checkpoint(checkpoint_path):
 		is os.path.isfile(os.path.join(checkpoint_path, "model_state.pth")):
