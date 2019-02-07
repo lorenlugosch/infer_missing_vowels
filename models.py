@@ -220,6 +220,8 @@ class EncoderDecoder(torch.nn.Module):
 
 		for u in range(U_max):
 			beam_extensions = []; beam_extension_scores = []; beam_pointers = []
+			if u < 30:
+				time.sleep(1)
 			for b in range(B):
 				# Get previous guess
 				if u == 0: 
@@ -232,7 +234,6 @@ class EncoderDecoder(torch.nn.Module):
 					# Select hypothesis (and corresponding decoder state/score) from beam
 					y_hat = beam[b]
 					if u < 30:
-						time.sleep(1)
 						print(one_hot_to_string(y_hat[0,:u], Sy).strip("\n"))
 
 					decoder_state = decoder_states[b]
