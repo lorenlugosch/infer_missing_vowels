@@ -39,7 +39,7 @@ model.eval()
 Sx = train_dataset.Sx; Sy = train_dataset.Sy; x_eos= train_dataset.x_eos; y_eos = train_dataset.y_eos
 pad_and_one_hot = PadAndOneHot(Sx, Sy, x_eos, y_eos)
 
-test_output = "It was then that he knew in his heart.\n"
+test_output = "It was the best of times, it was the worst of times.\n"
 test_output = test_output + "\n"*max(51-len(test_output),0) # pad so that length matches training distribution 
 test_input = "".join([c for c in test_output if c not in "AEIOUaeiou"]) # 'Hll, wrld!\n'
 x,y = pad_and_one_hot([(test_input, test_output)])
