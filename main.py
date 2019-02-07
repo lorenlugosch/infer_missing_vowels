@@ -22,8 +22,8 @@ model.load_state_dict(torch.load("model_state.pth"))
 if torch.cuda.is_available(): model = model.cuda()
 
 # Train the model
-num_epochs = 0
-trainer = Trainer(model, lr=0.001)
+num_epochs = 10
+trainer = Trainer(model, lr=0.0001)
 for epoch in range(num_epochs):
 	print("========= Epoch %d of %d =========" % (epoch+1, num_epochs))
 	train_acc, train_loss = trainer.train(train_dataset)
