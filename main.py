@@ -10,9 +10,9 @@ path = "war_and_peace.txt"
 train_dataset, valid_dataset, test_dataset = get_datasets(path)
 
 # Initialize model
-model = EncoderDecoder(	num_encoder_layers=2,
+model = EncoderDecoder(	num_encoder_layers=3,
 						num_encoder_hidden=256, 
-						num_decoder_layers=2, 
+						num_decoder_layers=3, 
 						num_decoder_hidden=512,
 						Sx_size=len(train_dataset.Sx),	# input alphabet
 						Sy_size=len(train_dataset.Sy),	# output alphabet
