@@ -12,7 +12,7 @@ class Trainer:
 		self.progress_df = pd.DataFrame()
 
 	def load_checkpoint(checkpoint_path):
-		is os.path.isfile(os.path.join(checkpoint_path, "model_state.pth")):
+		if os.path.isfile(os.path.join(checkpoint_path, "model_state.pth")):
 			self.model.load_state_dict(torch.load(os.path.join(checkpoint_path, "model_state.pth")))
 
 	def save_checkpoint(epoch, checkpoint_path):

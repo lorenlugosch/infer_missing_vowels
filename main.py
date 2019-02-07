@@ -36,7 +36,7 @@ for epoch in range(num_epochs):
 
 	trainer.save_checkpoint(epoch, checkpoint_path)
 
-# # Example of testing the model on a new phrase
+# Example of testing the model on a new phrase
 model.eval()
 Sx = train_dataset.Sx; Sy = train_dataset.Sy; x_eos= train_dataset.x_eos; y_eos = train_dataset.y_eos
 pad_and_one_hot = PadAndOneHot(Sx, Sy, x_eos, y_eos)
