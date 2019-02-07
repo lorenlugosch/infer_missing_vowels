@@ -11,11 +11,11 @@ class Trainer:
 		self.optimizer = torch.optim.Adam(model.parameters(), lr=self.lr, weight_decay=0.00001)
 		self.progress_df = pd.DataFrame()
 
-	def load_checkpoint(checkpoint_path):
+	def load_checkpoint(self, checkpoint_path):
 		if os.path.isfile(os.path.join(checkpoint_path, "model_state.pth")):
 			self.model.load_state_dict(torch.load(os.path.join(checkpoint_path, "model_state.pth")))
 
-	def save_checkpoint(epoch, checkpoint_path):
+	def save_checkpoint(self, epoch, checkpoint_path):
 		torch.save(self.model.state_dict(), os.path.join(checkpoint_path, "model_state.pth"))
 		
 	def train(self, dataset):
