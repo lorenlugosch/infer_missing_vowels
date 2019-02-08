@@ -91,7 +91,9 @@ class DecoderRNN(torch.nn.Module):
 
 def sort_beam(beam_extensions, beam_extension_scores, beam_pointers):
 	beam_width = len(beam_pointers); batch_size = beam_pointers[0].shape[0]
-	beam_extensions = torch.stack(beam_extensions); beam_extension_scores = torch.stack(beam_extension_scores).squeeze(1); beam_pointers = torch.stack(beam_pointers)
+	# beam_extensions = torch.stack(beam_extensions); beam_extension_scores = torch.stack(beam_extension_scores).squeeze(1); beam_pointers = torch.stack(beam_pointers)
+	beam_extensions = torch.stack(beam_extensions); beam_extension_scores = torch.stack(beam_extension_scores); beam_pointers = torch.stack(beam_pointers)
+	beam_extension_scores = beam_extension_scores.view(beam_width,batch_size)
 	# print(beam_extensions.shape); print(beam_extension_scores.shape); print(beam_pointers.shape); 
 
 	sort_order = beam_extension_scores.sort(dim=0, descending=True)[1].reshape(beam_width, batch_size)
