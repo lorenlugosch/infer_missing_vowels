@@ -209,10 +209,12 @@ class EncoderDecoder(torch.nn.Module):
 
 		for u in range(U_max):
 			beam_extensions = []; beam_extension_scores = []; beam_pointers = []
-			if debug:
-				if u < true_U:
-					time.sleep(1)
-					print("")
+
+			# Add a delay so that it's easier to read the outputs during debugging
+			if debug and u < true_U:
+				time.sleep(1)
+				print("")
+
 			for b in range(B):
 				# Get previous guess
 				if u == 0: 
@@ -227,9 +229,9 @@ class EncoderDecoder(torch.nn.Module):
 					decoder_state = decoder_states[b]
 					beam_score = beam_scores[b]
 					y_hat_u_1 = y_hat[:,u-1,:]
-					if debug:
-						if u < true_U:
-							print(one_hot_to_string(y_hat[0,:u], Sy).strip("\n") + " | score: %1.2f" % beam_score[0].item())
+
+					# If in debug mode, print out the current beam
+					if debug and u < true_U: print(one_hot_to_string(y_hat[0,:u], Sy).strip("\n") + " | score: %1.2f" % beam_score[0].item())
 
 				# Feed in the previous guess; update the decoder state
 				decoder_state = self.decoder_rnn(y_hat_u_1, decoder_state)
@@ -238,7 +240,7 @@ class EncoderDecoder(torch.nn.Module):
 				# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
 				decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state[:,-1]))
 
-				# Find the top B possible extensions
+				# Find the top B possible extensions for each of the B hypotheses
 				top_B_extension_scores, top_B_extensions = decoder_out.topk(B)
 				top_B_extension_scores = top_B_extension_scores.transpose(0,1); top_B_extensions = top_B_extensions.transpose(0,1)
 				for extension_index in range(B):
@@ -252,19 +254,19 @@ class EncoderDecoder(torch.nn.Module):
 				# At the first decoding timestep, there are no other hypotheses to extend.
 				if u == 0: break
 
-			# Of the (up to) B^2 extensions hypotheses, pick the top B
+			# Sort the B^2 extensions
 			beam_extensions, beam_extension_scores, beam_pointers = sort_beam(beam_extensions, beam_extension_scores, beam_pointers)
 			old_beam = beam.clone(); old_beam_scores = beam_scores.clone(); old_decoder_states = decoder_states.clone()
 			beam *= 0; beam_scores *= 0; decoder_states *= 0;
 
+			# Pick the top B extended hypotheses
 			for b in range(len(beam_extensions[:B])):
 				for batch_index in range(batch_size):
 					beam[b,batch_index] = old_beam[beam_pointers[b, batch_index],batch_index]
-					beam[b,batch_index,u,:] = beam_extensions[b, batch_index]
-					beam_scores[b, batch_index] = beam_extension_scores[b, batch_index]
+					beam[b,batch_index,u,:] = beam_extensions[b, batch_index] # append the extensions to each hypothesis
+					beam_scores[b, batch_index] = beam_extension_scores[b, batch_index] # update the beam scores
 					decoder_states[b, batch_index] = old_decoder_states[beam_pointers[b, batch_index],batch_index]
 
-		# y_hat = torch.cat([y_.unsqueeze(1) for y_ in beam[0]], dim=1)
 		y_hat = beam[0]
 		return y_hat
 
