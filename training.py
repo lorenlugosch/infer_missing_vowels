@@ -65,7 +65,7 @@ class Trainer:
 			if idx % print_interval == 0:
 				print("input: " + one_hot_to_string(x[0], dataset.Sx))
 				print("truth: " + one_hot_to_string(y[0], dataset.Sy))
-				y_hat = self.model.infer(x, dataset.Sy, B=1)
+				y_hat = self.model.infer(x,x_lengths,y_lengths,dataset.Sy, B=1)
 				print("greedy guess: " + one_hot_to_string(y_hat[0], dataset.Sy))
 				y_hat = self.model.infer(x, dataset.Sy, B=4)
 				print("beam guess: " + one_hot_to_string(y_hat[0], dataset.Sy))
@@ -73,7 +73,7 @@ class Trainer:
 
 				print("input: " + one_hot_to_string(x[1], dataset.Sx))
 				print("truth: " + one_hot_to_string(y[1], dataset.Sy))
-				y_hat = self.model.infer(x, dataset.Sy, B=1)
+				y_hat = self.model.infer(x,x_lengths,y_lengths,dataset.Sy, B=1)
 				print("greedy guess: " + one_hot_to_string(y_hat[1], dataset.Sy))
 				y_hat = self.model.infer(x, dataset.Sy, B=4)
 				print("beam guess: " + one_hot_to_string(y_hat[1], dataset.Sy))

@@ -176,7 +176,7 @@ class EncoderDecoder(torch.nn.Module):
 
 		return log_p_y_x
 
-	def infer(self, x, Sy, B=2, debug=False, true_U=None):
+	def infer(self, x, x_lengths, y_lengths, Sy, B=2, debug=False, true_U=None):
 		"""
 		x : Tensor of shape (batch size, T, |Sx|)
 		Sy : list of characters (output alphabet)
@@ -190,7 +190,7 @@ class EncoderDecoder(torch.nn.Module):
 		Sy_size = len(Sy)
 
 		# Encode the input sequence into a single fixed-length vector
-		encoder_state = self.encoder_rnn(x)
+		encoder_state = self.encoder_rnn(x, x_lengths)
 
 		# Initialize the decoder state using the encoder state
 		decoder_state = self.encoder_linear(encoder_state)
