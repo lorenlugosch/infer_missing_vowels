@@ -38,8 +38,9 @@ class TextDataset(torch.utils.data.Dataset):
 		return len(self.lines)
 
 	def __getitem__(self, idx):
-		x = "".join(c for c in self.lines[idx] if c not in "AEIOUaeiou") # remove vowels
-		y = self.lines[idx]
+		line = self.lines[idx]
+		x = "".join(c for c in line if c not in "AEIOUaeiou") # remove vowels
+		y = line
 		return (x,y)
 
 class PadAndOneHot:

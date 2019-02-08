@@ -92,7 +92,7 @@ class DecoderRNN(torch.nn.Module):
 def sort_beam(beam_extensions, beam_extension_scores, beam_pointers):
 	beam_width = len(beam_pointers); batch_size = beam_pointers[0].shape[0]
 	beam_extensions = torch.stack(beam_extensions); beam_extension_scores = torch.stack(beam_extension_scores).squeeze(1); beam_pointers = torch.stack(beam_pointers)
-	print(beam_extensions.shape); print(beam_extension_scores.shape); print(beam_pointers.shape); 
+	# print(beam_extensions.shape); print(beam_extension_scores.shape); print(beam_pointers.shape); 
 
 	sort_order = beam_extension_scores.sort(dim=0, descending=True)[1].reshape(beam_width, batch_size)
 	sorted_beam_extensions = beam_extensions.clone(); sorted_beam_extension_scores = beam_extension_scores.clone(); sorted_beam_pointers = beam_pointers.clone()
@@ -187,32 +187,10 @@ class EncoderDecoder(torch.nn.Module):
 		decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
 
 		U_max = 100
-		# greedy = True
-		# if greedy:
-		# 	y_hat = []
-		# 	for u in range(U_max):
-		# 		# Get previous guess
-		# 		if u == 0: y_hat_u_1 = torch.zeros(batch_size, Sy_size)
-		# 		else: y_hat_u_1 = y_hat[-1]
-		# 		if torch.cuda.is_available(): y_hat_u_1 = y_hat_u_1.cuda()
+		if true_U is None:
+			true_U = U_max
 
-		# 		# Feed in the previous guess; update the decoder state
-		# 		decoder_state = self.decoder_rnn(y_hat_u_1, decoder_state)
-
-		# 		# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
-		# 		decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state[:,-1]))
-
-		# 		# Find the top output
-		# 		extension = torch.zeros(batch_size, Sy_size)
-		# 		extension[torch.arange(batch_size), decoder_out.max(dim=1)[1]] = 1.
-		# 		y_hat.append(extension.clone())
-
-		# 	# Return top (only) output
-		# 	beam = [y_hat]
-
-		# else: 
-		# beam = []; beam_scores = []; decoder_states = []
-		decoder_state_shape = decoder_state.shape # (batch_size, )
+		decoder_state_shape = decoder_state.shape
 		beam = torch.zeros(B,batch_size,U_max,Sy_size); beam_scores = torch.zeros(B,batch_size); decoder_states = torch.zeros(B,decoder_state_shape[0], decoder_state_shape[1], decoder_state_shape[2])
 		if torch.cuda.is_available():
 			beam = beam.cuda()
@@ -256,6 +234,7 @@ class EncoderDecoder(torch.nn.Module):
 				for extension_index in range(B):
 					extension = torch.zeros(batch_size, Sy_size)
 					extension_score = top_B_extension_scores[extension_index] + beam_score
+					print(top_B_extension_scores[extension_index].shape); print(beam_score.shape)
 					extension[torch.arange(batch_size), top_B_extensions[extension_index]] = 1.
 					beam_extensions.append(extension.clone())
 					beam_extension_scores.append(extension_score.clone())
