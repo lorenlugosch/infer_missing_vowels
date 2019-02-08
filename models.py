@@ -91,10 +91,8 @@ class DecoderRNN(torch.nn.Module):
 
 def sort_beam(beam_extensions, beam_extension_scores, beam_pointers):
 	beam_width = len(beam_pointers); batch_size = beam_pointers[0].shape[0]
-	# beam_extensions = torch.stack(beam_extensions); beam_extension_scores = torch.stack(beam_extension_scores).squeeze(1); beam_pointers = torch.stack(beam_pointers)
 	beam_extensions = torch.stack(beam_extensions); beam_extension_scores = torch.stack(beam_extension_scores); beam_pointers = torch.stack(beam_pointers)
 	beam_extension_scores = beam_extension_scores.view(beam_width,batch_size)
-	# print(beam_extensions.shape); print(beam_extension_scores.shape); print(beam_pointers.shape); 
 
 	sort_order = beam_extension_scores.sort(dim=0, descending=True)[1].reshape(beam_width, batch_size)
 	sorted_beam_extensions = beam_extensions.clone(); sorted_beam_extension_scores = beam_extension_scores.clone(); sorted_beam_pointers = beam_pointers.clone()
@@ -246,19 +244,12 @@ class EncoderDecoder(torch.nn.Module):
 
 			# Of the (up to) B^2 extensions hypotheses, pick the top B
 			beam_extensions, beam_extension_scores, beam_pointers = sort_beam(beam_extensions, beam_extension_scores, beam_pointers)
-			# old_beam = beam.clone(); old_beam_scores = beam_scores.clone(); old_decoder_states = decoder_states.clone()
-			# beam = torch.zeros(B,batch_size,U_max,Sy_size); beam_scores = torch.zeros(B,batch_size); decoder_states = torch.zeros(B,decoder_state_shape[0], decoder_state_shape[1], decoder_state_shape[2])
 			old_beam = beam.clone(); old_beam_scores = beam_scores.clone(); old_decoder_states = decoder_states.clone()
 			beam *= 0; beam_scores *= 0; decoder_states *= 0;
-			
-			# if torch.cuda.is_available():
-			# 	beam = beam.cuda()
-			# 	beam_scores = beam_scores.cuda()
-			# 	decoder_states = decoder_states.cuda()
 
 			for b in range(len(beam_extensions[:B])):
 				for batch_index in range(batch_size):
-					beam[b,batch_index] = old_beam[beam_pointers[b, batch_index],batch_index] #.clone()?
+					beam[b,batch_index] = old_beam[beam_pointers[b, batch_index],batch_index]
 					beam[b,batch_index,u,:] = beam_extensions[b, batch_index]
 					beam_scores[b, batch_index] = beam_extension_scores[b, batch_index]
 					decoder_states[b, batch_index] = old_decoder_states[beam_pointers[b, batch_index],batch_index] #.clone()?
