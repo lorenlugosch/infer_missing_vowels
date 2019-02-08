@@ -42,7 +42,7 @@ class EncoderRNN(torch.nn.Module):
 		# for how to use pad/pack
 		sorted_lengths, sorting_indices = x_lengths.sort(0, descending=True)
 		sorted_input = input[sorting_indices]
-		packed = torch.nn.utils.rnn.pack_padded_sequence(sorted_input, sorted_lengths.cpu().numpy())
+		packed = torch.nn.utils.rnn.pack_padded_sequence(sorted_input, sorted_lengths.cpu().numpy(), batch_first=True)
 		_, sorted_final_state = self.gru(packed)
 		sorted_final_state = torch.cat([sorted_final_state[-1], sorted_final_state[-2]], dim=1)
 		_, unsorting_indices = sorting_indices.sort(0)
