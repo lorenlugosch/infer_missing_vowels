@@ -31,14 +31,22 @@ class EncoderRNN(torch.nn.Module):
 		super(EncoderRNN, self).__init__()
 		self.gru = torch.nn.GRU(input_size=input_size, hidden_size=num_encoder_hidden, num_layers=num_encoder_layers, batch_first=True, dropout=dropout, bidirectional=True)
 
-	def forward(self, input):
+	def forward(self, input, x_lengths):
 		"""
 		input: Tensor of shape (batch size, T, |Sx|)
+		x_lengths : list of integers
 		
 		Map the input sequence to a fixed-length encoding.
 		"""
-		_, final_state = self.gru(input)
-		final_state = torch.cat([final_state[-1], final_state[-2]], dim=1)
+		# see https://gist.github.com/Tushar-N/dfca335e370a2bc3bc79876e6270099e
+		# for how to use pad/pack
+		sorted_lengths, sorting_indices = x_lengths.sort(0, descending=True)
+		sorted_input = input[sorting_indices]
+		packed = torch.nn.utils.rnn.pack_padded_sequence(sorted_input, sorted_lengths.cpu().numpy())
+		_, sorted_final_state = self.gru(packed)
+		sorted_final_state = torch.cat([sorted_final_state[-1], sorted_ final_state[-2]], dim=1)
+		_, unsorting_indices = sorting_indices.sort(0)
+		final_state = sorted_final_state[unsorting_indices]
 		return final_state
 
 class DecoderRNN(torch.nn.Module):
@@ -119,10 +127,12 @@ class EncoderDecoder(torch.nn.Module):
 		self.y_eos = y_eos # index of the end-of-sequence token
 		# self.attention = Attention(key_dim=100, value_dim=200)
 
-	def forward(self, x, y):
+	def forward(self, x, y, x_lengths=None, y_lengths=None):
 		"""
 		x : Tensor of shape (batch size, T, |Sx|)
 		y : Tensor of shape (batch size, U, |Sy|) - padded with end-of-sequence tokens
+		x_lengths : list of integers
+		y_lengths : list of integers
 
 		Compute log p(y|x) for each (x,y) in the batch.
 		"""
@@ -135,7 +145,7 @@ class EncoderDecoder(torch.nn.Module):
 		Sy_size = y.shape[2]
 
 		# Encode the input sequence into a single fixed-length vector
-		encoder_state = self.encoder_rnn(x)
+		encoder_state = self.encoder_rnn(x, x_lengths)
 
 		# Initialize the decoder state using the encoder state
 		decoder_state = self.encoder_linear(encoder_state)
