@@ -66,8 +66,10 @@ class PadAndOneHot:
 			y.append([self.Sy.index(c) for c in y_])
 
 		# pad all sequences with EOS to have same length
-		T = max([len(x_) for x_ in x])
-		U = max([len(y_) for y_ in y])
+		x_lengths = [len(x_) for x_ in x]
+		y_lengths = [len(y_) for y_ in y]
+		T = max(x_lengths)
+		U = max(y_lengths)
 		for index in range(batch_size):
 			x[index] += [self.x_eos] * (T - len(x[index]))
 			x[index] = torch.tensor(x[index])
