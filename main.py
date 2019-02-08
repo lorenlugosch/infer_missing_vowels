@@ -30,11 +30,10 @@ for epoch in range(num_epochs):
 	print("========= Epoch %d of %d =========" % (epoch+1, num_epochs))
 	train_acc, train_loss = trainer.train(train_dataset)
 	valid_acc, valid_loss = trainer.test(valid_dataset)
+	trainer.save_checkpoint(epoch, checkpoint_path)
 
 	print("========= Results: epoch %d of %d =========" % (epoch+1, num_epochs))
 	print("train accuracy: %.2f| train loss: %.2f| valid accuracy: %.2f| valid loss: %.2f\n" % (train_acc, train_loss, valid_acc, valid_loss) )
-
-	trainer.save_checkpoint(epoch, checkpoint_path)
 
 # Example of testing the model on a new phrase
 model.eval()
