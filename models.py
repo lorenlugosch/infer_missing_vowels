@@ -199,6 +199,8 @@ class EncoderDecoder(torch.nn.Module):
 		U_max = 100
 		if true_U is None:
 			true_U = U_max
+		else:
+			U_max = true_U
 
 		decoder_state_shape = decoder_state.shape
 		beam = torch.zeros(B,batch_size,U_max,Sy_size); beam_scores = torch.zeros(B,batch_size); decoder_states = torch.zeros(B,decoder_state_shape[0], decoder_state_shape[1], decoder_state_shape[2])
