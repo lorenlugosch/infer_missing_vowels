@@ -2,6 +2,7 @@ import torch
 import torch.utils.data
 from collections import Counter
 from helper_functions import one_hot
+import os
 
 def get_datasets(path):
 	# # war and peace
