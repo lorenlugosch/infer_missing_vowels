@@ -44,10 +44,9 @@ class EncoderRNN(torch.nn.Module):
 		sorted_input = input[sorting_indices]
 		packed = torch.nn.utils.rnn.pack_padded_sequence(sorted_input, sorted_lengths.cpu().numpy(), batch_first=True)
 		sorted_outputs, sorted_final_state = self.gru(packed)
-		sorted_outputs = torch.nn.utils.rnn.pad_packed_sequence(sorted_outputs)
+		sorted_outputs = torch.nn.utils.rnn.pad_packed_sequence(sorted_outputs)[0]
 		sorted_final_state = torch.cat([sorted_final_state[-1], sorted_final_state[-2]], dim=1)
 		_, unsorting_indices = sorting_indices.sort(0)
-		print(sorted_outputs);
 		final_state = sorted_final_state[unsorting_indices]
 		outputs = sorted_outputs[unsorting_indices]
 		return outputs, final_state
