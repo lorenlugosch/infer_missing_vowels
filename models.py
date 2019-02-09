@@ -43,11 +43,13 @@ class EncoderRNN(torch.nn.Module):
 		sorted_lengths, sorting_indices = x_lengths.sort(0, descending=True)
 		sorted_input = input[sorting_indices]
 		packed = torch.nn.utils.rnn.pack_padded_sequence(sorted_input, sorted_lengths.cpu().numpy(), batch_first=True)
-		_, sorted_final_state = self.gru(packed)
+		sorted_outputs, sorted_final_state = self.gru(packed)
+		sorted_outputs = torch.nn.utils.rnn.pad_packed_sequence(sorted_outputs)
 		sorted_final_state = torch.cat([sorted_final_state[-1], sorted_final_state[-2]], dim=1)
 		_, unsorting_indices = sorting_indices.sort(0)
 		final_state = sorted_final_state[unsorting_indices]
-		return final_state
+		outputs = sorted_outputs[unsorting_indices]
+		return outputs, final_state
 
 class DecoderRNN(torch.nn.Module):
 	def __init__(self, num_decoder_layers, num_decoder_hidden, input_size, dropout):
@@ -117,16 +119,23 @@ class EncoderDecoder(torch.nn.Module):
 	- forward(): computes the probability of an input/output sequence pair.
 	- infer(): given the input sequence, infer the most likely output sequence.
 	"""
-	def __init__(self, num_encoder_layers, num_encoder_hidden, num_decoder_layers, num_decoder_hidden, Sx_size, Sy_size, y_eos, dropout):
+	def __init__(self, num_encoder_layers, num_encoder_hidden, num_decoder_layers, num_decoder_hidden, Sx_size, Sy_size, y_eos, dropout, use_attention):
 		super(EncoderDecoder, self).__init__()
 		self.encoder_rnn = EncoderRNN(num_encoder_layers, num_encoder_hidden, Sx_size, dropout)
 		self.encoder_linear = torch.nn.Linear(num_encoder_hidden*2, num_decoder_hidden*num_decoder_layers)
-		self.decoder_rnn = DecoderRNN(num_decoder_layers, num_decoder_hidden, Sy_size, dropout)
+		self.using_attention = use_attention
+		key_dim = 100
+		value_dim = 200
+		if self.using_attention:
+			self.decoder_init_state = torch.nn.Parameter(torch.randn(key_dim))
+			self.attention = Attention(key_dim=key_dim, value_dim=value_dim)
+			self.decoder_rnn = DecoderRNN(num_decoder_layers, num_decoder_hidden, Sy_size, dropout)
+		else:
+			self.decoder_rnn = DecoderRNN(num_decoder_layers, num_decoder_hidden, Sy_size + value_dim, dropout)
 		self.decoder_linear = torch.nn.Linear(num_decoder_hidden, Sy_size)
 		self.decoder_log_softmax = torch.nn.LogSoftmax(dim=1)
 		self.y_eos = y_eos # index of the end-of-sequence token
-		# self.attention = Attention(key_dim=100, value_dim=200)
-
+		
 	def forward(self, x, y, x_lengths=None, y_lengths=None):
 		"""
 		x : Tensor of shape (batch size, T, |Sx|)
@@ -144,12 +153,15 @@ class EncoderDecoder(torch.nn.Module):
 		U = y.shape[1]
 		Sy_size = y.shape[2]
 
-		# Encode the input sequence into a single fixed-length vector
-		encoder_state = self.encoder_rnn(x, x_lengths)
+		# Encode the input sequence
+		encoder_outputs, encoder_final_state = self.encoder_rnn(x, x_lengths)
 
 		# Initialize the decoder state using the encoder state
-		decoder_state = self.encoder_linear(encoder_state)
-		decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
+		if self.using_attention:
+			decoder_state = self.decoder_init_state
+		else:
+			decoder_state = self.encoder_linear(encoder_final_state)
+			decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
 
 		# Initialize log p(y|x), y_u-1 to zeros
 		log_p_y_x = 0
@@ -157,12 +169,12 @@ class EncoderDecoder(torch.nn.Module):
 		if torch.cuda.is_available(): y_u_1 = y_u_1.cuda()
 		for u in range(0, U):
 			# Feed in the previous element of y and the attention output; update the decoder state
-			# context = self.attention(encoder_outputs)
-			# decoder_input = torch.cat([y_u_1, context])
-			# decoder_state = self.decoder_rnn(decoder_input, decoder_state)
-
-			# Feed in the previous element of y; update the decoder state
-			decoder_state = self.decoder_rnn(y_u_1, decoder_state)
+			if self.using_attention:
+				context = self.attention(encoder_outputs, decoder_state)
+				decoder_input = torch.cat([y_u_1, context], dim=1)
+			else:
+				decoder_input = y_u_1
+			decoder_state = self.decoder_rnn(decoder_input, decoder_state)
 
 			# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
 			decoder_out = self.decoder_log_softmax(self.decoder_linear(decoder_state[:,-1]))
