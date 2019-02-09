@@ -40,8 +40,8 @@ model.eval()
 Sx = train_dataset.Sx; Sy = train_dataset.Sy; x_eos= train_dataset.x_eos; y_eos = train_dataset.y_eos
 pad_and_one_hot = PadAndOneHot(Sx, Sy, x_eos, y_eos)
 
-test_output = "There are five kinds of constitutions,\" said I, \"and five kinds of soul.\"\n"
-# test_output = test_output + "\n"*max(51-len(test_output),0) # pad so that length matches training distribution 
+test_output = "it was the best of times, it was the worst of times.\n"
+test_output = test_output.lower()
 test_input = "".join([c for c in test_output if c not in "AEIOUaeiou"]) # 'Hll, wrld!\n'
 x,y,x_lengths,y_lengths = pad_and_one_hot([(test_input, test_output)])
 y_hat = model.infer(x, x_lengths, y_lengths, Sy, B=8, debug=True, true_U=len(test_output))
