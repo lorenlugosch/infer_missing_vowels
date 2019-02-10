@@ -177,6 +177,7 @@ class EncoderDecoder(torch.nn.Module):
 			else:
 				decoder_input = y_u_1
 			print(decoder_state.shape)
+			print(decoder_input.shape)
 			decoder_state = self.decoder_rnn(decoder_input, decoder_state)
 
 			# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
