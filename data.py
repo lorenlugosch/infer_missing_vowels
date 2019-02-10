@@ -5,40 +5,40 @@ from helper_functions import one_hot
 import os
 
 def get_datasets(path):
-	# # war and peace
-	# with open(path, "r") as f:
-	# 	lines = f.readlines()
-	# lines[-1] += '\n'
-
-	# # get input and output alphabets
-	# Sy = list(Counter(("".join(lines))).keys()) # set of possible output letters
-	# Sx = [letter for letter in Sy if letter not in "AEIOUaeiou"] # remove vowels from set of possible input letters
-
-	# # split dataset
-	# total_lines = len(lines)
-	# one_tenth = total_lines // 10
-
-	# train_dataset = TextDataset(lines[0:one_tenth * 8], Sx, Sy)
-	# valid_dataset = TextDataset(lines[one_tenth * 8: one_tenth * 9], Sx, Sy)
-	# test_dataset = TextDataset(lines[one_tenth * 9:], Sx, Sy)
-
-	# PTB
-	with open(os.path.join(path,"ptb.train.txt"), "r") as f:
+	# war and peace
+	with open("war_and_peace.txt", "r") as f:
 		lines = f.readlines()
+	lines[-1] += '\n'
 
 	# get input and output alphabets
 	Sy = list(Counter(("".join(lines))).keys()) # set of possible output letters
 	Sx = [letter for letter in Sy if letter not in "AEIOUaeiou"] # remove vowels from set of possible input letters
 
-	train_dataset = TextDataset(lines, Sx, Sy)
+	# split dataset
+	total_lines = len(lines)
+	one_tenth = total_lines // 10
 
-	with open(os.path.join(path,"ptb.valid.txt"), "r") as f:
-		lines = f.readlines()
-	valid_dataset = TextDataset(lines, Sx, Sy)
+	train_dataset = TextDataset(lines[0:one_tenth * 8], Sx, Sy)
+	valid_dataset = TextDataset(lines[one_tenth * 8: one_tenth * 9], Sx, Sy)
+	test_dataset = TextDataset(lines[one_tenth * 9:], Sx, Sy)
 
-	with open(os.path.join(path,"ptb.test.txt"), "r") as f:
-		lines = f.readlines()
-	test_dataset = TextDataset(lines, Sx, Sy)
+	# # PTB
+	# with open(os.path.join(path,"ptb.train.txt"), "r") as f:
+	# 	lines = f.readlines()
+
+	# # get input and output alphabets
+	# Sy = list(Counter(("".join(lines))).keys()) # set of possible output letters
+	# Sx = [letter for letter in Sy if letter not in "AEIOUaeiou"] # remove vowels from set of possible input letters
+
+	# train_dataset = TextDataset(lines, Sx, Sy)
+
+	# with open(os.path.join(path,"ptb.valid.txt"), "r") as f:
+	# 	lines = f.readlines()
+	# valid_dataset = TextDataset(lines, Sx, Sy)
+
+	# with open(os.path.join(path,"ptb.test.txt"), "r") as f:
+	# 	lines = f.readlines()
+	# test_dataset = TextDataset(lines, Sx, Sy)
 
 	return train_dataset, valid_dataset, test_dataset
 
