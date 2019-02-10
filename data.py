@@ -26,6 +26,10 @@ def get_datasets(path):
 	with open(os.path.join(path,"ptb.train.txt"), "r") as f:
 		lines = f.readlines()
 
+	with open("war_and_peace.txt", "r") as f:
+		lines += f.readlines()
+	lines[-1] += '\n'	
+
 	# get input and output alphabets
 	Sy = list(Counter(("".join(lines))).keys()) # set of possible output letters
 	Sx = [letter for letter in Sy if letter not in "AEIOUaeiou"] # remove vowels from set of possible input letters
