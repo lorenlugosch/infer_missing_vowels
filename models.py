@@ -158,7 +158,7 @@ class EncoderDecoder(torch.nn.Module):
 
 		# Initialize the decoder state using the encoder state
 		if self.using_attention:
-			decoder_state = self.decoder_init_state
+			decoder_state = torch.stack([self.decoder_init_state] * batch_size)
 		else:
 			decoder_state = self.encoder_linear(encoder_final_state)
 			decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
