@@ -12,15 +12,15 @@ class Attention(torch.nn.Module):
 		self.value_linear = torch.nn.Linear(encoder_dim, value_dim)
 		self.softmax = torch.nn.Softmax(dim=1)
 
-	def forward(self, input, decoder_state):
+	def forward(self, encoder_states, decoder_state):
 		"""
-		input: Tensor of shape (batch size, T, encoder_dim)
+		encoder_states: Tensor of shape (batch size, T, encoder_dim)
 		decoder_state: Tensor of shape (batch size, decoder_dim)
 		
 		Map the input sequences to vectors (batch size, value_dim) using attention, given a query.
 		"""
-		keys = self.key_linear(input)
-		values = self.value_linear(input)
+		keys = self.key_linear(encoder_states)
+		values = self.value_linear(encoder_states)
 		query = self.query_linear(decoder_state)
 		query = query.unsqueeze(2)
 		scores = torch.matmul(keys, query) / self.scale_factor
