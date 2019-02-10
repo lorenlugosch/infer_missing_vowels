@@ -6,7 +6,7 @@ import time
 class Attention(torch.nn.Module):
 	def __init__(self, encoder_dim, decoder_dim, key_dim, value_dim):
 		super(Attention, self).__init__()
-		self.scale_factor = torch.sqrt(torch.tensor(key_dim).float()); print(self.scale_factor)
+		self.scale_factor = torch.sqrt(torch.tensor(key_dim).float())
 		self.key_linear = torch.nn.Linear(encoder_dim, key_dim)
 		self.query_linear = torch.nn.Linear(decoder_dim, key_dim)
 		self.value_linear = torch.nn.Linear(encoder_dim, value_dim)
@@ -23,7 +23,7 @@ class Attention(torch.nn.Module):
 		values = self.value_linear(encoder_states)
 		query = self.query_linear(decoder_state)
 		query = query.unsqueeze(2)
-		scores = torch.matmul(keys, query) / self.scale_factor
+		scores = torch.matmul(keys, query) #/ self.scale_factor
 		normalized_scores = self.softmax(scores).transpose(1,2)
 		out = torch.matmul(normalized_scores, values).squeeze(1)
 		return out
@@ -173,7 +173,6 @@ class EncoderDecoder(torch.nn.Module):
 			# Feed in the previous element of y and the attention output; update the decoder state
 			if self.using_attention:
 				context = self.attention(encoder_outputs, decoder_state[:,-1])
-				print(context[0])
 				decoder_input = torch.cat([y_u_1, context], dim=1)
 			else:
 				decoder_input = y_u_1
