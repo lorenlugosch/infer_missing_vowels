@@ -124,7 +124,6 @@ class EncoderDecoder(torch.nn.Module):
 	def __init__(self, num_encoder_layers, num_encoder_hidden, num_decoder_layers, num_decoder_hidden, Sx_size, Sy_size, y_eos, dropout, use_attention):
 		super(EncoderDecoder, self).__init__()
 		self.encoder_rnn = EncoderRNN(num_encoder_layers, num_encoder_hidden, Sx_size, dropout)
-		self.encoder_linear = torch.nn.Linear(num_encoder_hidden*2, num_decoder_hidden*num_decoder_layers)
 		self.using_attention = use_attention
 		key_dim = 100
 		value_dim = 200
@@ -133,6 +132,7 @@ class EncoderDecoder(torch.nn.Module):
 			self.attention = Attention(encoder_dim=num_encoder_hidden*2, decoder_dim=num_decoder_hidden, key_dim=key_dim, value_dim=value_dim)
 			self.decoder_rnn = DecoderRNN(num_decoder_layers, num_decoder_hidden, Sy_size + value_dim, dropout)
 		else:
+			self.encoder_linear = torch.nn.Linear(num_encoder_hidden*2, num_decoder_hidden*num_decoder_layers)
 			self.decoder_rnn = DecoderRNN(num_decoder_layers, num_decoder_hidden, Sy_size, dropout)
 		self.decoder_linear = torch.nn.Linear(num_decoder_hidden, Sy_size)
 		self.decoder_log_softmax = torch.nn.LogSoftmax(dim=1)
