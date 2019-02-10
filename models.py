@@ -128,10 +128,10 @@ class EncoderDecoder(torch.nn.Module):
 		if self.using_attention:
 			self.decoder_init_state = torch.nn.Parameter(torch.randn(key_dim))
 			self.attention = Attention(input_dim=num_encoder_hidden*2, key_dim=key_dim, value_dim=value_dim)
-			self.decoder_rnn = DecoderRNN(num_decoder_layers, num_decoder_hidden, Sy_size, dropout)
+			self.decoder_rnn = DecoderRNN(num_decoder_layers, num_decoder_hidden, Sy_size + value_dim, dropout)
 		else:
 			self.encoder_linear = torch.nn.Linear(num_encoder_hidden*2, num_decoder_hidden*num_decoder_layers)
-			self.decoder_rnn = DecoderRNN(num_decoder_layers, num_decoder_hidden, Sy_size + value_dim, dropout)
+			self.decoder_rnn = DecoderRNN(num_decoder_layers, num_decoder_hidden, Sy_size, dropout)
 		self.decoder_linear = torch.nn.Linear(num_decoder_hidden, Sy_size)
 		self.decoder_log_softmax = torch.nn.LogSoftmax(dim=1)
 		self.y_eos = y_eos # index of the end-of-sequence token
