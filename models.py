@@ -128,7 +128,7 @@ class EncoderDecoder(torch.nn.Module):
 		key_dim = 100
 		value_dim = 200
 		if self.using_attention:
-			self.decoder_init_state = torch.nn.Parameter(torch.randn(num_decoder_hidden))
+			self.decoder_init_state = torch.nn.Parameter(torch.randn(num_decoder_layers,num_decoder_hidden))
 			self.attention = Attention(encoder_dim=num_encoder_hidden*2, decoder_dim=num_decoder_hidden, key_dim=key_dim, value_dim=value_dim)
 			self.decoder_rnn = DecoderRNN(num_decoder_layers, num_decoder_hidden, Sy_size + value_dim, dropout)
 		else:
@@ -176,8 +176,6 @@ class EncoderDecoder(torch.nn.Module):
 				decoder_input = torch.cat([y_u_1, context], dim=1)
 			else:
 				decoder_input = y_u_1
-			print(decoder_state.shape)
-			print(decoder_input.shape)
 			decoder_state = self.decoder_rnn(decoder_input, decoder_state)
 
 			# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
