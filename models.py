@@ -4,22 +4,24 @@ import sys
 import time
 
 class Attention(torch.nn.Module):
-	def __init__(self, input_dim, key_dim, value_dim):
+	def __init__(self, encoder_dim, decoder_dim, key_dim, value_dim):
 		super(Attention, self).__init__()
 		self.scale_factor = torch.sqrt(torch.tensor(key_dim).float())
-		self.key_linear = torch.nn.Linear(input_dim, key_dim)
-		self.value_linear = torch.nn.Linear(input_dim, value_dim)
+		self.key_linear = torch.nn.Linear(encoder_dim, key_dim)
+		self.query_linear = torch.nn.Linear(decoder_dim, key_dim)
+		self.value_linear = torch.nn.Linear(encoder_dim, value_dim)
 		self.softmax = torch.nn.Softmax(dim=1)
 
-	def forward(self, input, query):
+	def forward(self, input, decoder_state):
 		"""
-		input: Tensor of shape (batch size, T, input_dim)
-		query: Tensor of shape (batch size, key_dim)
+		input: Tensor of shape (batch size, T, encoder_dim)
+		decoder_state: Tensor of shape (batch size, decoder_dim)
 		
 		Map the input sequences to vectors (batch size, value_dim) using attention, given a query.
 		"""
 		keys = self.key_linear(input)
 		values = self.value_linear(input)
+		query = self.query_linear(decoder_state)
 		query = query.unsqueeze(2)
 		scores = torch.matmul(keys, query) / self.scale_factor
 		normalized_scores = self.softmax(scores).transpose(1,2)
@@ -126,8 +128,8 @@ class EncoderDecoder(torch.nn.Module):
 		key_dim = 100
 		value_dim = 200
 		if self.using_attention:
-			self.decoder_init_state = torch.nn.Parameter(torch.randn(key_dim))
-			self.attention = Attention(input_dim=num_encoder_hidden*2, key_dim=key_dim, value_dim=value_dim)
+			self.decoder_init_state = torch.nn.Parameter(torch.randn(num_decoder_hidden))
+			self.attention = Attention(encoder_dim=num_encoder_hidden*2, decoder_dim=num_decoder_hidden, key_dim=key_dim, value_dim=value_dim)
 			self.decoder_rnn = DecoderRNN(num_decoder_layers, num_decoder_hidden, Sy_size + value_dim, dropout)
 		else:
 			self.encoder_linear = torch.nn.Linear(num_encoder_hidden*2, num_decoder_hidden*num_decoder_layers)
