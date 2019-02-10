@@ -124,6 +124,7 @@ class EncoderDecoder(torch.nn.Module):
 	def __init__(self, num_encoder_layers, num_encoder_hidden, num_decoder_layers, num_decoder_hidden, Sx_size, Sy_size, y_eos, dropout, use_attention):
 		super(EncoderDecoder, self).__init__()
 		self.encoder_rnn = EncoderRNN(num_encoder_layers, num_encoder_hidden, Sx_size, dropout)
+		self.encoder_linear = torch.nn.Linear(num_encoder_hidden*2, num_decoder_hidden*num_decoder_layers)
 		self.using_attention = use_attention
 		key_dim = 100
 		value_dim = 200
@@ -132,7 +133,6 @@ class EncoderDecoder(torch.nn.Module):
 			self.attention = Attention(encoder_dim=num_encoder_hidden*2, decoder_dim=num_decoder_hidden, key_dim=key_dim, value_dim=value_dim)
 			self.decoder_rnn = DecoderRNN(num_decoder_layers, num_decoder_hidden, Sy_size + value_dim, dropout)
 		else:
-			self.encoder_linear = torch.nn.Linear(num_encoder_hidden*2, num_decoder_hidden*num_decoder_layers)
 			self.decoder_rnn = DecoderRNN(num_decoder_layers, num_decoder_hidden, Sy_size, dropout)
 		self.decoder_linear = torch.nn.Linear(num_decoder_hidden, Sy_size)
 		self.decoder_log_softmax = torch.nn.LogSoftmax(dim=1)
@@ -159,11 +159,14 @@ class EncoderDecoder(torch.nn.Module):
 		encoder_outputs, encoder_final_state = self.encoder_rnn(x, x_lengths)
 
 		# Initialize the decoder state using the encoder state
-		if self.using_attention:
-			decoder_state = torch.stack([self.decoder_init_state] * batch_size)
-		else:
-			decoder_state = self.encoder_linear(encoder_final_state)
-			decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
+		# if self.using_attention:
+		# 	decoder_state = torch.stack([self.decoder_init_state] * batch_size)
+		# else:
+		# 	decoder_state = self.encoder_linear(encoder_final_state)
+		# 	decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
+
+		decoder_state = self.encoder_linear(encoder_final_state)
+		decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
 
 		# Initialize log p(y|x), y_u-1 to zeros
 		log_p_y_x = 0
