@@ -6,7 +6,7 @@ import time
 class Attention(torch.nn.Module):
 	def __init__(self, encoder_dim, decoder_dim, key_dim, value_dim):
 		super(Attention, self).__init__()
-		self.scale_factor = torch.sqrt(torch.tensor(key_dim).float())
+		self.scale_factor = torch.sqrt(torch.tensor(key_dim).float()); print(self.scale_factor)
 		self.key_linear = torch.nn.Linear(encoder_dim, key_dim)
 		self.query_linear = torch.nn.Linear(decoder_dim, key_dim)
 		self.value_linear = torch.nn.Linear(encoder_dim, value_dim)
@@ -159,14 +159,11 @@ class EncoderDecoder(torch.nn.Module):
 		encoder_outputs, encoder_final_state = self.encoder_rnn(x, x_lengths)
 
 		# Initialize the decoder state using the encoder state
-		# if self.using_attention:
-		# 	decoder_state = torch.stack([self.decoder_init_state] * batch_size)
-		# else:
-		# 	decoder_state = self.encoder_linear(encoder_final_state)
-		# 	decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
-
-		decoder_state = self.encoder_linear(encoder_final_state)
-		decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
+		if self.using_attention:
+			decoder_state = torch.stack([self.decoder_init_state] * batch_size)
+		else:
+			decoder_state = self.encoder_linear(encoder_final_state)
+			decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
 
 		# Initialize log p(y|x), y_u-1 to zeros
 		log_p_y_x = 0
@@ -176,6 +173,7 @@ class EncoderDecoder(torch.nn.Module):
 			# Feed in the previous element of y and the attention output; update the decoder state
 			if self.using_attention:
 				context = self.attention(encoder_outputs, decoder_state[:,-1])
+				print(context[0])
 				decoder_input = torch.cat([y_u_1, context], dim=1)
 			else:
 				decoder_input = y_u_1
@@ -209,14 +207,12 @@ class EncoderDecoder(torch.nn.Module):
 		# Encode the input sequence
 		encoder_outputs, encoder_final_state = self.encoder_rnn(x, x_lengths)
 
-		# # Initialize the decoder state using the encoder state
-		# if self.using_attention:
-		# 	decoder_state = torch.stack([self.decoder_init_state] * batch_size)
-		# else:
-		# 	decoder_state = self.encoder_linear(encoder_final_state)
-		# 	decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
-		decoder_state = self.encoder_linear(encoder_final_state)
-		decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
+		# Initialize the decoder state using the encoder state
+		if self.using_attention:
+			decoder_state = torch.stack([self.decoder_init_state] * batch_size)
+		else:
+			decoder_state = self.encoder_linear(encoder_final_state)
+			decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
 
 		U_max = 100
 		if true_U is None:

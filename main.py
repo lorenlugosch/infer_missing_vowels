@@ -19,11 +19,11 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						Sy_size=len(train_dataset.Sy),	# output alphabet
 						y_eos=train_dataset.y_eos,		# index of end-of-sequence symbol for output
 						dropout=0.5,
-						use_attention=False)
+						use_attention=True)
 if torch.cuda.is_available(): model = model.cuda()
 
 # Train the model
-num_epochs = 50
+num_epochs = 0
 trainer = Trainer(model, lr=0.001)
 trainer.load_checkpoint(checkpoint_path)
 
