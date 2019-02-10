@@ -209,12 +209,14 @@ class EncoderDecoder(torch.nn.Module):
 		# Encode the input sequence
 		encoder_outputs, encoder_final_state = self.encoder_rnn(x, x_lengths)
 
-		# Initialize the decoder state using the encoder state
-		if self.using_attention:
-			decoder_state = torch.stack([self.decoder_init_state] * batch_size)
-		else:
-			decoder_state = self.encoder_linear(encoder_final_state)
-			decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
+		# # Initialize the decoder state using the encoder state
+		# if self.using_attention:
+		# 	decoder_state = torch.stack([self.decoder_init_state] * batch_size)
+		# else:
+		# 	decoder_state = self.encoder_linear(encoder_final_state)
+		# 	decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
+		decoder_state = self.encoder_linear(encoder_final_state)
+		decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
 
 		U_max = 100
 		if true_U is None:
