@@ -172,7 +172,7 @@ class EncoderDecoder(torch.nn.Module):
 		for u in range(0, U):
 			# Feed in the previous element of y and the attention output; update the decoder state
 			if self.using_attention:
-				context = self.attention(encoder_outputs, decoder_state.view(batch_size,-1))
+				context = self.attention(encoder_outputs, decoder_state[:,-1])
 				decoder_input = torch.cat([y_u_1, context], dim=1)
 			else:
 				decoder_input = y_u_1
