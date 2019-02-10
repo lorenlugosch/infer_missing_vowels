@@ -45,6 +45,7 @@ test_output = "it was the best of times, it was the worst of times.\n"
 test_output = test_output.lower()
 test_input = "".join([c for c in test_output if c not in "AEIOUaeiou"]) # 'Hll, wrld!\n'
 x,y,x_lengths,y_lengths = pad_and_one_hot([(test_input, test_output)])
+model(x,y,x_lengths,y_lengths)
 y_hat = model.infer(x, x_lengths, y_lengths, Sy, B=8, debug=True, true_U=len(test_output))
 print("input: " + one_hot_to_string(x[0], Sx))
 print("truth: " + one_hot_to_string(y[0], Sy))
