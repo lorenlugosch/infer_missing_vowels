@@ -203,12 +203,15 @@ class EncoderDecoder(torch.nn.Module):
 		batch_size = x.shape[0]
 		Sy_size = len(Sy)
 
-		# Encode the input sequence into a single fixed-length vector
-		encoder_state = self.encoder_rnn(x, x_lengths)
+		# Encode the input sequence
+		encoder_outputs, encoder_final_state = self.encoder_rnn(x, x_lengths)
 
 		# Initialize the decoder state using the encoder state
-		decoder_state = self.encoder_linear(encoder_state)
-		decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
+		if self.using_attention:
+			decoder_state = torch.stack([self.decoder_init_state] * batch_size)
+		else:
+			decoder_state = self.encoder_linear(encoder_final_state)
+			decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
 
 		U_max = 100
 		if true_U is None:
@@ -250,7 +253,12 @@ class EncoderDecoder(torch.nn.Module):
 					if debug and u < true_U: print(one_hot_to_string(y_hat[0,:u], Sy).strip("\n") + " | score: %1.2f" % beam_score[0].item())
 
 				# Feed in the previous guess; update the decoder state
-				decoder_state = self.decoder_rnn(y_hat_u_1, decoder_state)
+				if self.using_attention:
+					context = self.attention(encoder_outputs, decoder_state[:,-1])
+					decoder_input = torch.cat([y_hat_u_1, context], dim=1)
+				else:
+					decoder_input = y_hat_u_1
+				decoder_state = self.decoder_rnn(decoder_input, decoder_state)
 				decoder_states[b] = decoder_state.clone()
 
 				# Compute log p(y_u|y_1, y_2, ..., x) (the log probability of the next element)
