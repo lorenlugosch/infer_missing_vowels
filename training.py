@@ -63,7 +63,7 @@ class Trainer:
 			test_loss += loss.cpu().data.numpy().item() * batch_size
 			# test_acc += edit_distance(y,y_hat) * batch_size
 			if idx % print_interval == 0:
-				x = x[0].unsqueeze(0); y = y[0].unsqueeze(0); x_lengths = x_lengths[0]; y_lengths = y_lengths[0]
+				x = x[:2]; y = y[:2]; x_lengths = x_lengths[:2]; y_lengths = y_lengths[:2]
 				y_hat_greedy = self.model.infer(x,x_lengths,y_lengths,dataset.Sy, true_U=U, B=1)
 				y_hat_beam = self.model.infer(x,x_lengths,y_lengths,dataset.Sy, true_U=U, B=4)
 				print("input: " + one_hot_to_string(x[0], dataset.Sx))
