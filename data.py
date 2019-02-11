@@ -24,12 +24,12 @@ def get_datasets(path):
 
 	# PTB
 	with open(os.path.join(path,"ptb.train.txt"), "r") as f:
-		lines = f.readlines()
+		lines = f.readlines()[:]
 
 	with open("war_and_peace.txt", "r") as f:
-		wp_lines = f.readlines()
-	wp_lines[-1] += '\n'
-	lines += wp_lines
+		lines = f.readlines()
+	lines[-1] += '\n'
+	# lines += wp_lines
 
 	# get input and output alphabets
 	Sy = list(Counter(("".join(lines))).keys()) # set of possible output letters
