@@ -24,7 +24,7 @@ def get_datasets(path):
 
 	# PTB
 	with open(os.path.join(path,"ptb.train.txt"), "r") as f:
-		lines = f.readlines()[:1000]
+		lines = f.readlines()[:2000]
 
 	with open("war_and_peace.txt", "r") as f:
 		wp_lines = f.readlines()
