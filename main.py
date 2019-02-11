@@ -29,7 +29,7 @@ trainer.load_checkpoint(checkpoint_path)
 
 for epoch in range(num_epochs):
 	print("========= Epoch %d of %d =========" % (epoch+1, num_epochs))
-	# train_acc, train_loss = trainer.train(train_dataset)
+	train_acc, train_loss = trainer.train(train_dataset)
 	valid_acc, valid_loss = trainer.test(valid_dataset)
 	trainer.save_checkpoint(epoch, checkpoint_path)
 
