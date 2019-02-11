@@ -22,10 +22,9 @@ def get_datasets(path):
 	# valid_dataset = TextDataset(lines[one_tenth * 8: one_tenth * 9], Sx, Sy)
 	# test_dataset = TextDataset(lines[one_tenth * 9:], Sx, Sy)
 
-	# PTB
-	# with open(os.path.join(path,"ptb.train.txt"), "r") as f:
-	# 	lines = f.readlines()[:10000]
-	lines = []
+	PTB
+	with open(os.path.join(path,"ptb.train.txt"), "r") as f:
+		lines = f.readlines()[:100]
 
 	with open("war_and_peace.txt", "r") as f:
 		wp_lines = f.readlines()
