@@ -62,18 +62,14 @@ class Trainer:
 			loss = -log_probs.mean() / U
 			test_loss += loss.cpu().data.numpy().item() * batch_size
 			# test_acc += edit_distance(y,y_hat) * batch_size
-			if idx % print_interval == 0 and U < 200:
+			if idx % print_interval == 0:
+				x = x[0].unsqueeze(0); y = y[0].unsqueeze(0); x_lengths = x_lengths[0]; y_lengths = y_lengths[0]
 				y_hat_greedy = self.model.infer(x,x_lengths,y_lengths,dataset.Sy, true_U=U, B=1)
 				y_hat_beam = self.model.infer(x,x_lengths,y_lengths,dataset.Sy, true_U=U, B=4)
 				print("input: " + one_hot_to_string(x[0], dataset.Sx))
 				print("truth: " + one_hot_to_string(y[0], dataset.Sy))
 				print("greedy guess: " + one_hot_to_string(y_hat_greedy[0], dataset.Sy))
 				print("beam guess: " + one_hot_to_string(y_hat_beam[0], dataset.Sy))
-				print("")
-				print("input: " + one_hot_to_string(x[1], dataset.Sx))
-				print("truth: " + one_hot_to_string(y[1], dataset.Sy))
-				print("greedy guess: " + one_hot_to_string(y_hat_greedy[1], dataset.Sy))
-				print("beam guess: " + one_hot_to_string(y_hat_beam[1], dataset.Sy))
 				print("")
 		test_loss /= num_samples
 		test_acc /= num_samples

@@ -18,7 +18,7 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						Sx_size=len(train_dataset.Sx),	# input alphabet
 						Sy_size=len(train_dataset.Sy),	# output alphabet
 						y_eos=train_dataset.y_eos,		# index of end-of-sequence symbol for output
-						dropout=0.1,
+						dropout=0.5,
 						use_attention=True)
 if torch.cuda.is_available(): model = model.cuda()
 
@@ -29,7 +29,7 @@ trainer.load_checkpoint(checkpoint_path)
 
 for epoch in range(num_epochs):
 	print("========= Epoch %d of %d =========" % (epoch+1, num_epochs))
-	train_acc, train_loss = trainer.train(train_dataset)
+	# train_acc, train_loss = trainer.train(train_dataset)
 	valid_acc, valid_loss = trainer.test(valid_dataset)
 	trainer.save_checkpoint(epoch, checkpoint_path)
 
