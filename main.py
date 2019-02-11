@@ -24,7 +24,7 @@ if torch.cuda.is_available(): model = model.cuda()
 
 # Train the model
 num_epochs = 50
-trainer = Trainer(model, lr=0.0001)
+trainer = Trainer(model, lr=0.001)
 trainer.load_checkpoint(checkpoint_path)
 
 for epoch in range(num_epochs):
