@@ -49,5 +49,3 @@ y_hat = model.infer(x, x_lengths, y_lengths, Sy, B=8)#, debug=True, true_U=len(t
 print("input: " + one_hot_to_string(x[0], Sx))
 print("truth: " + one_hot_to_string(y[0], Sy))
 print("guess: " + one_hot_to_string(y_hat[0], Sy))
-
-
