@@ -138,6 +138,8 @@ class EncoderDecoder(torch.nn.Module):
 		self.decoder_log_softmax = torch.nn.LogSoftmax(dim=1)
 		self.y_eos = y_eos # index of the end-of-sequence token
 		self.is_cuda = torch.cuda.is_available()
+		if self.is_cuda:
+			self.cuda()
 		
 	def forward(self, x, y, x_lengths=None, y_lengths=None):
 		"""
