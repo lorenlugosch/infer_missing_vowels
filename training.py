@@ -13,9 +13,6 @@ class Trainer:
 		self.train_df = pd.DataFrame(columns=["loss","lr"])
 		self.valid_df = pd.DataFrame(columns=["loss","lr"])
 
-	def test_one_string(test_input, test_output):
-
-
 	def load_checkpoint(self, checkpoint_path):
 		if os.path.isfile(os.path.join(checkpoint_path, "model_state.pth")):
 			try:
