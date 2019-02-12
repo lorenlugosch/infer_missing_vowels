@@ -24,8 +24,8 @@ model = EncoderDecoder(	num_encoder_layers=2,
 # 	model = model.cuda()
 
 # Train the model
-num_epochs = 1
-trainer = Trainer(model, lr=0.00001)
+num_epochs = 10
+trainer = Trainer(model, lr=0.0001)
 trainer.load_checkpoint(checkpoint_path)
 
 for epoch in range(num_epochs):
