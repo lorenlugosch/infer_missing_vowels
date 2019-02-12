@@ -23,7 +23,7 @@ model = EncoderDecoder(	num_encoder_layers=2,
 if torch.cuda.is_available(): model = model.cuda()
 
 # Train the model
-num_epochs = 50
+num_epochs = 0
 trainer = Trainer(model, lr=0.0001)
 trainer.load_checkpoint(checkpoint_path)
 
