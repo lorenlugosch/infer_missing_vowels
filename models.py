@@ -137,6 +137,7 @@ class EncoderDecoder(torch.nn.Module):
 		self.decoder_linear = torch.nn.Linear(num_decoder_hidden, Sy_size)
 		self.decoder_log_softmax = torch.nn.LogSoftmax(dim=1)
 		self.y_eos = y_eos # index of the end-of-sequence token
+		self.is_cuda = torch.cuda.is_available()
 		
 	def forward(self, x, y, x_lengths=None, y_lengths=None):
 		"""
@@ -147,7 +148,7 @@ class EncoderDecoder(torch.nn.Module):
 
 		Compute log p(y|x) for each (x,y) in the batch.
 		"""
-		if torch.cuda.is_available():
+		if self.is_cuda:
 			x = x.cuda()
 			y = y.cuda()
 
@@ -168,7 +169,7 @@ class EncoderDecoder(torch.nn.Module):
 		# Initialize log p(y|x), y_u-1 to zeros
 		log_p_y_x = 0
 		y_u_1 = torch.zeros(batch_size, Sy_size)
-		if torch.cuda.is_available(): y_u_1 = y_u_1.cuda()
+		if self.is_cuda: y_u_1 = y_u_1.cuda()
 		for u in range(0, U):
 			# Feed in the previous element of y and the attention output; update the decoder state
 			if self.using_attention:
@@ -198,7 +199,7 @@ class EncoderDecoder(torch.nn.Module):
 		Run beam search to find y_hat = argmax_y log p(y|x) for every (x) in the batch.
 		(If B = 1, this is equivalent to greedy search.)
 		"""
-		if torch.cuda.is_available(): x = x.cuda()
+		if self.is_cuda: x = x.cuda()
 
 		batch_size = x.shape[0]
 		Sy_size = len(Sy)
@@ -221,7 +222,7 @@ class EncoderDecoder(torch.nn.Module):
 
 		decoder_state_shape = decoder_state.shape
 		beam = torch.zeros(B,batch_size,U_max,Sy_size); beam_scores = torch.zeros(B,batch_size); decoder_states = torch.zeros(B,decoder_state_shape[0], decoder_state_shape[1], decoder_state_shape[2])
-		if torch.cuda.is_available():
+		if self.is_cuda:
 			beam = beam.cuda()
 			beam_scores = beam_scores.cuda()
 			decoder_states = decoder_states.cuda()
@@ -239,7 +240,7 @@ class EncoderDecoder(torch.nn.Module):
 				if u == 0: 
 					beam_score = beam_scores[b]
 					y_hat_u_1 = torch.zeros(batch_size, Sy_size)
-					if torch.cuda.is_available():
+					if self.is_cuda:
 						beam_score = beam_score.cuda()
 						y_hat_u_1 = y_hat_u_1.cuda()
 				else: 

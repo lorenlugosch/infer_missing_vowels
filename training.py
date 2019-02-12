@@ -63,6 +63,8 @@ class Trainer:
 			test_loss += loss.cpu().data.numpy().item() * batch_size
 			# test_acc += edit_distance(y,y_hat) * batch_size
 			if idx % print_interval == 0:
+				model.is_cuda = False # Beam search may cause a GPU out-of-memory---do this on the CPU, for now
+				model.cpu()
 				x = x[:2]; y = y[:2]; x_lengths = x_lengths[:2]; y_lengths = y_lengths[:2]
 				y_hat_greedy = self.model.infer(x,x_lengths,y_lengths,dataset.Sy, true_U=U, B=1)
 				y_hat_beam = self.model.infer(x,x_lengths,y_lengths,dataset.Sy, true_U=U, B=4)
@@ -71,6 +73,8 @@ class Trainer:
 				print("greedy guess: " + one_hot_to_string(y_hat_greedy[0], dataset.Sy))
 				print("beam guess: " + one_hot_to_string(y_hat_beam[0], dataset.Sy))
 				print("")
+				model.is_cuda = True
+				model.cuda()
 		test_loss /= num_samples
 		test_acc /= num_samples
 		self.scheduler.step(test_loss) # if the validation loss hasn't decreased, lower the learning rate

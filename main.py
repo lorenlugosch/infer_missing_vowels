@@ -20,7 +20,8 @@ model = EncoderDecoder(	num_encoder_layers=2,
 						y_eos=train_dataset.y_eos,		# index of end-of-sequence symbol for output
 						dropout=0.1,
 						use_attention=True)
-if torch.cuda.is_available(): model = model.cuda()
+# if torch.cuda.is_available():
+# 	model = model.cuda()
 
 # Train the model
 num_epochs = 0
@@ -41,10 +42,10 @@ model.eval()
 Sx = train_dataset.Sx; Sy = train_dataset.Sy; x_eos= train_dataset.x_eos; y_eos = train_dataset.y_eos
 pad_and_one_hot = PadAndOneHot(Sx, Sy, x_eos, y_eos)
 
-test_output = "My name is Inigo Montoya. You killed my father. Prepare to die!\n"
+test_output = "the greatest song in the world\n"
 test_input = "".join([c for c in test_output if c not in "AEIOUaeiou"]) # 'Hll, wrld!\n'
 x,y,x_lengths,y_lengths = pad_and_one_hot([(test_input, test_output)])
-y_hat = model.infer(x, x_lengths, y_lengths, Sy, B=8, debug=True, true_U=len(test_output))
+y_hat = model.infer(x, x_lengths, y_lengths, Sy, B=8)#, debug=True, true_U=len(test_output)+10)
 print("input: " + one_hot_to_string(x[0], Sx))
 print("truth: " + one_hot_to_string(y[0], Sy))
 print("guess: " + one_hot_to_string(y_hat[0], Sy))
