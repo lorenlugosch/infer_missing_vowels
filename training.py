@@ -16,7 +16,10 @@ class Trainer:
 	def load_checkpoint(self, checkpoint_path):
 		if os.path.isfile(os.path.join(checkpoint_path, "model_state.pth")):
 			try:
-				self.model.load_state_dict(torch.load(os.path.join(checkpoint_path, "model_state.pth")))
+				if self.model.is_cuda:
+					self.model.load_state_dict(torch.load(os.path.join(checkpoint_path, "model_state.pth")))
+				else:
+					self.model.load_state_dict(torch.load(os.path.join(checkpoint_path, "model_state.pth"), map_location="cpu"))
 			except:
 				print("Could not load previous model; starting from scratch")
 		else:
