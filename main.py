@@ -12,9 +12,9 @@ checkpoint_path = "."
 
 # Initialize model
 model = EncoderDecoder(	num_encoder_layers=2,
-						num_encoder_hidden=128, 
+						num_encoder_hidden=512, 
 						num_decoder_layers=2, 
-						num_decoder_hidden=128,
+						num_decoder_hidden=512,
 						Sx_size=len(train_dataset.Sx),	# input alphabet
 						Sy_size=len(train_dataset.Sy),	# output alphabet
 						y_eos=train_dataset.y_eos,		# index of end-of-sequence symbol for output
@@ -24,7 +24,7 @@ model = EncoderDecoder(	num_encoder_layers=2,
 # 	model = model.cuda()
 
 # Train the model
-num_epochs = 10
+num_epochs = 50
 trainer = Trainer(model, lr=0.0001)
 trainer.load_checkpoint(checkpoint_path)
 
