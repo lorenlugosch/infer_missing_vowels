@@ -43,7 +43,7 @@ pad_and_one_hot = PadAndOneHot(Sx, Sy, x_eos, y_eos)
 test_output = "Most people have little difficulty reading this sentence.\n"
 test_input = "".join([c for c in test_output if c not in "AEIOUaeiou"])
 x,y,x_lengths,y_lengths = pad_and_one_hot([(test_input, test_output)])
-y_hat = model.infer(x, x_lengths, y_lengths, Sy, B=8, debug=True)
+y_hat = model.infer(x, x_lengths, Sy, y_lengths, B=8, debug=True)
 print("input: " + one_hot_to_string(x[0], Sx))
 print("truth: " + one_hot_to_string(y[0], Sy))
 print("guess: " + one_hot_to_string(y_hat[0], Sy))

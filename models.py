@@ -193,7 +193,7 @@ class EncoderDecoder(torch.nn.Module):
 
 		return log_p_y_x
 
-	def infer(self, x, x_lengths, y_lengths=None, Sy, B=2, debug=False):
+	def infer(self, x, x_lengths, Sy, y_lengths=None, B=2, debug=False):
 		"""
 		x : Tensor of shape (batch size, T, |Sx|)
 		Sy : list of characters (output alphabet)
