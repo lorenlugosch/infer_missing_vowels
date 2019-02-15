@@ -193,7 +193,7 @@ class EncoderDecoder(torch.nn.Module):
 
 		return log_p_y_x
 
-	def infer(self, x, x_lengths, y_lengths, Sy, B=2, debug=False, true_U=None):
+	def infer(self, x, x_lengths, y_lengths=None, Sy, B=2, debug=False):
 		"""
 		x : Tensor of shape (batch size, T, |Sx|)
 		Sy : list of characters (output alphabet)
@@ -216,20 +216,19 @@ class EncoderDecoder(torch.nn.Module):
 			decoder_state = self.encoder_linear(encoder_final_state)
 			decoder_state = decoder_state.view(batch_size, self.decoder_rnn.num_layers, -1)
 
-		U_max = 100
-		if true_U is None:
-			true_U = U_max
-		else:
-			U_max = true_U
+		true_U = 100
+
+		if y_lengths is not None:
+			true_U = max(y_lengths)
 
 		decoder_state_shape = decoder_state.shape
-		beam = torch.zeros(B,batch_size,U_max,Sy_size); beam_scores = torch.zeros(B,batch_size); decoder_states = torch.zeros(B,decoder_state_shape[0], decoder_state_shape[1], decoder_state_shape[2])
+		beam = torch.zeros(B,batch_size,true_U,Sy_size); beam_scores = torch.zeros(B,batch_size); decoder_states = torch.zeros(B,decoder_state_shape[0], decoder_state_shape[1], decoder_state_shape[2])
 		if self.is_cuda:
 			beam = beam.cuda()
 			beam_scores = beam_scores.cuda()
 			decoder_states = decoder_states.cuda()
 
-		for u in range(U_max):
+		for u in range(true_U):
 			beam_extensions = []; beam_extension_scores = []; beam_pointers = []
 
 			# Add a delay so that it's easier to read the outputs during debugging
