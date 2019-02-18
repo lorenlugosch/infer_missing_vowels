@@ -5,8 +5,7 @@ from training import Trainer
 from helper_functions import one_hot_to_string
 
 # Generate datasets from text file
-# (To use a difference text file, just change the path. The text file must contain strings separated by newlines.)
-data_path = "ptb" #"war_and_peace.txt"
+data_path = "data"
 train_dataset, valid_dataset, test_dataset = get_datasets(data_path)
 checkpoint_path = "."
 
