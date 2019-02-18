@@ -69,8 +69,8 @@ class Trainer:
 				self.model.is_cuda = False # Beam search may cause a GPU out-of-memory---do this on the CPU, for now
 				self.model.cpu()
 				x = x[:2]; y = y[:2]; x_lengths = x_lengths[:2]; y_lengths = y_lengths[:2]
-				y_hat_greedy = self.model.infer(x,x_lengths,y_lengths,dataset.Sy, true_U=U, B=1)
-				y_hat_beam = self.model.infer(x,x_lengths,y_lengths,dataset.Sy, true_U=U, B=4)
+				y_hat_greedy = self.model.infer(x, x_lengths, dataset.Sy, y_lengths, B=1) 
+				y_hat_beam = self.model.infer(x, x_lengths, dataset.Sy, y_lengths, B=4)
 				print("input: " + one_hot_to_string(x[0], dataset.Sx))
 				print("truth: " + one_hot_to_string(y[0], dataset.Sy))
 				print("greedy guess: " + one_hot_to_string(y_hat_greedy[0], dataset.Sy))
